@@ -1,0 +1,7 @@
+Django==5.2.1
+graphene-django==3.2.3
+django-graphql-jwt==0.4.0
+django-cors-headers==4.7.0
+Pillow==11.2.1
+python-dotenv==1.1.0
+psycopg2-binary==2.9.10 
