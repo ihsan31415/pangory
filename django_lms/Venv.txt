@@ -1,0 +1,16 @@
+# Buat dan aktifkan virtual environment
+python -m venv venv
+# Windows:
+# venv\Scripts\activate
+# macOS/Linux:
+source venv/bin/activate
+
+# Install Django dan Django REST framework (untuk API yang lebih baik nanti)
+pip install django djangorestframework
+
+# Buat proyek Django
+django-admin startproject lms_project .
+
+# Buat aplikasi Django (misalnya untuk user dan course)
+python manage.py startapp users
+python manage.py startapp courses
