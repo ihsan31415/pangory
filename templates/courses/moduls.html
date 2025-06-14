@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Course Content Management with Tasks</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        .draggable-item {
+            cursor: grab;
+            transition: all 0.2s ease;
+        }
+        .draggable-item:active {
+            cursor: grabbing;
+        }
+        .draggable-item.dragging {
+            opacity: 0.5;
+            background-color: #f0f9ff;
+        }
+        .material-type-content {
+            display: none;
+        }
+        .material-type-content.active {
+            display: block;
+        }
+        .tab-button.active {
+            border-bottom-color: #0891b2;
+            color: #0891b2;
+        }
+        .task-item {
+            border-left: 4px solid transparent;
+        }
+        .task-item.high-priority {
+            border-left-color: #ef4444;
+        }
+        .task-item.medium-priority {
+            border-left-color: #f59e0b;
+        }
+        .task-item.low-priority {
+            border-left-color: #10b981;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 flex items-center">
+                        <i class="fas fa-graduation-cap text-2xl text-cyan-600 mr-2"></i>
+                        <span class="text-xl font-bold text-gray-800">CourseApp Admin</span>
+                    </div>
+                </div>
+                <div class="flex items-center">
+                    <a href="#" class="px-4 py-2 rounded-md text-sm font-medium text-white bg-cyan-600 hover:bg-cyan-700">Logout</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Course Header -->
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-2xl font-bold text-gray-800">Web Development Fundamentals</h1>
+            <span class="px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">Published</span>
+        </div>
+
+        <!-- Module and Material Management -->
+        <div class="bg-white shadow rounded-lg overflow-hidden">
+            <!-- Tabs -->
+            <div class="border-b border-gray-200">
+                <nav class="flex -mb-px">
+                    <button id="modulesTab" class="tab-button active border-b-2 border-cyan-500 text-cyan-600 px-4 py-4 text-sm font-medium">Modules</button>
+                    <button id="materialsTab" class="tab-button border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 px-4 py-4 text-sm font-medium">Materials</button>
+                    <button id="tasksTab" class="tab-button border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 px-4 py-4 text-sm font-medium">Tasks</button>
+                </nav>
+            </div>
+
+            <!-- Modules Panel -->
+            <div id="modulesPanel" class="p-6">
+                <!-- Add Module Button -->
+                <button id="addModuleBtn" class="mb-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-cyan-600 hover:bg-cyan-700">
+                    <i class="fas fa-plus mr-2"></i> Add Module
+                </button>
+
+                <!-- Modules List -->
+                <div id="modulesList" class="space-y-4">
+                    <!-- Module Item (Sample) -->
+                    <div class="module-item border border-gray-200 rounded-lg p-4 draggable-item" data-id="1">
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center">
+                                <i class="fas fa-grip-vertical text-gray-400 mr-3 cursor-move handle"></i>
+                                <div>
+                                    <h3 class="font-medium text-gray-900">Introduction to HTML</h3>
+                                    <p class="text-sm text-gray-500">Learn the basics of HTML structure</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <span class="text-xs px-2 py-1 bg-gray-100 rounded">Order: 1</span>
+                                <button class="edit-module text-cyan-600 hover:text-cyan-800">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="delete-module text-red-600 hover:text-red-800">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Materials Panel (Hidden by default) -->
+            <div id="materialsPanel" class="p-6 hidden">
+                <!-- Module Selection -->
+                <div class="mb-6">
+                    <label for="moduleSelect" class="block text-sm font-medium text-gray-700">Select Module</label>
+                    <select id="moduleSelect" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-cyan-500 focus:border-cyan-500 rounded-md">
+                        <option value="">-- Select a Module --</option>
+                        <option value="1">1. Introduction to HTML</option>
+                    </select>
+                </div>
+
+                <!-- Add Material Button -->
+                <button id="addMaterialBtn" class="mb-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-cyan-600 hover:bg-cyan-700">
+                    <i class="fas fa-plus mr-2"></i> Add Material
+                </button>
+
+                <!-- Materials List -->
+                <div id="materialsList" class="space-y-4">
+                    <!-- Material Item (Sample) -->
+                    <div class="material-item border border-gray-200 rounded-lg p-4 draggable-item" data-id="1">
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center">
+                                <i class="fas fa-grip-vertical text-gray-400 mr-3 cursor-move handle"></i>
+                                <div>
+                                    <h3 class="font-medium text-gray-900">HTML Document Structure</h3>
+                                    <div class="flex items-center space-x-2 mt-1">
+                                        <span class="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded">Text</span>
+                                        <span class="text-xs px-2 py-1 bg-gray-100 rounded">Order: 1</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <button class="edit-material text-cyan-600 hover:text-cyan-800">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="delete-material text-red-600 hover:text-red-800">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tasks Panel (Hidden by default) -->
+            <div id="tasksPanel" class="p-6 hidden">
+                <!-- Module Selection for Tasks -->
+                <div class="mb-6">
+                    <label for="taskModuleSelect" class="block text-sm font-medium text-gray-700">Select Module</label>
+                    <select id="taskModuleSelect" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-cyan-500 focus:border-cyan-500 rounded-md">
+                        <option value="">-- Select a Module --</option>
+                        <option value="1">1. Introduction to HTML</option>
+                    </select>
+                </div>
+
+                <!-- Add Task Button -->
+                <button id="addTaskBtn" class="mb-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-cyan-600 hover:bg-cyan-700">
+                    <i class="fas fa-plus mr-2"></i> Add Task
+                </button>
+
+                <!-- Tasks List -->
+                <div id="tasksList" class="space-y-3">
+                    <!-- Task Item (Sample) -->
+                    <div class="task-item bg-white border border-gray-200 rounded-md p-4 medium-priority" data-id="1">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h3 class="font-medium text-gray-900">Create HTML Page</h3>
+                                <p class="text-sm text-gray-600 mt-1">Build a basic HTML page with proper structure</p>
+                                <div class="flex items-center mt-2 space-x-4">
+                                    <span class="text-xs px-2 py-1 bg-gray-100 rounded flex items-center">
+                                        <i class="fas fa-calendar-alt mr-1 text-gray-500"></i>
+                                        Due: 2023-12-15
+                                    </span>
+                                    <span class="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded">
+                                        25 Points
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <button class="edit-task text-cyan-600 hover:text-cyan-800">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="delete-task text-red-600 hover:text-red-800">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Task Item Template (Hidden) -->
+                    <div id="taskTemplate" class="task-item bg-white border border-gray-200 rounded-md p-4 hidden" data-id="">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h3 class="font-medium text-gray-900 task-title"></h3>
+                                <p class="text-sm text-gray-600 mt-1 task-description"></p>
+                                <div class="flex items-center mt-2 space-x-4">
+                                    <span class="task-due-date text-xs px-2 py-1 bg-gray-100 rounded flex items-center">
+                                        <i class="fas fa-calendar-alt mr-1 text-gray-500"></i>
+                                    </span>
+                                    <span class="task-points text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded">
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <button class="edit-task text-cyan-600 hover:text-cyan-800">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="delete-task text-red-600 hover:text-red-800">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Task Modal -->
+    <div id="taskModal" class="fixed z-10 inset-0 overflow-y-auto hidden">
+        <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+                <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+            </div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
+                <div>
+                    <h3 id="taskModalTitle" class="text-lg leading-6 font-medium text-gray-900">Add New Task</h3>
+                    <div class="mt-4 space-y-4">
+                        <div>
+                            <label for="taskTitle" class="block text-sm font-medium text-gray-700">Title</label>
+                            <input type="text" id="taskTitle" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-cyan-500 focus:border-cyan-500">
+                        </div>
+                        <div>
+                            <label for="taskDescription" class="block text-sm font-medium text-gray-700">Description</label>
+                            <textarea id="taskDescription" rows="3" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-cyan-500 focus:border-cyan-500"></textarea>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label for="taskDueDate" class="block text-sm font-medium text-gray-700">Due Date</label>
+                                <input type="date" id="taskDueDate" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-cyan-500 focus:border-cyan-500">
+                            </div>
+                            <div>
+                                <label for="taskPoints" class="block text-sm font-medium text-gray-700">Points</label>
+                                <input type="number" id="taskPoints" min="1" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-cyan-500 focus:border-cyan-500">
+                            </div>
+                        </div>
+                        <div>
+                            <label for="taskPriority" class="block text-sm font-medium text-gray-700">Priority</label>
+                            <select id="taskPriority" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-cyan-500 focus:border-cyan-500 rounded-md">
+                                <option value="high">High</option>
+                                <option value="medium" selected>Medium</option>
+                                <option value="low">Low</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 sm:grid-flow-row-dense">
+                    <button type="button" id="saveTaskBtn" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-cyan-600 text-base font-medium text-white hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 sm:col-start-2 sm:text-sm">
+                        Save Task
+                    </button>
+                    <button type="button" id="cancelTaskBtn" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 sm:mt-0 sm:col-start-1 sm:text-sm">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Notification -->
+    <div id="successNotification" class="fixed bottom-4 right-4 bg-green-500 text-white px-4 py-3 rounded-md shadow-lg hidden">
+        <div class="flex items-center">
+            <i class="fas fa-check-circle mr-2"></i>
+            <span id="successMessage">Task saved successfully!</span>
+        </div>
+    </div>
+
+    <script>
+        // Tab Switching
+        const tabs = {
+            modules: {
+                tab: document.getElementById('modulesTab'),
+                panel: document.getElementById('modulesPanel')
+            },
+            materials: {
+                tab: document.getElementById('materialsTab'),
+                panel: document.getElementById('materialsPanel')
+            },
+            tasks: {
+                tab: document.getElementById('tasksTab'),
+                panel: document.getElementById('tasksPanel')
+            }
+        };
+
+        function activateTab(selectedTab) {
+            // Deactivate all tabs
+            Object.values(tabs).forEach(tab => {
+                tab.tab.classList.remove('active', 'border-cyan-500', 'text-cyan-600');
+                tab.tab.classList.add('border-transparent', 'text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300');
+                tab.panel.classList.add('hidden');
+            });
+            
+            // Activate selected tab
+            selectedTab.tab.classList.add('active', 'border-cyan-500', 'text-cyan-600');
+            selectedTab.tab.classList.remove('border-transparent', 'text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300');
+            selectedTab.panel.classList.remove('hidden');
+        }
+
+        tabs.modules.tab.addEventListener('click', () => activateTab(tabs.modules));
+        tabs.materials.tab.addEventListener('click', () => activateTab(tabs.materials));
+        tabs.tasks.tab.addEventListener('click', () => activateTab(tabs.tasks));
+
+        // Task Management
+        const taskModal = document.getElementById('taskModal');
+        const addTaskBtn = document.getElementById('addTaskBtn');
+        const saveTaskBtn = document.getElementById('saveTaskBtn');
+        const cancelTaskBtn = document.getElementById('cancelTaskBtn');
+        const tasksList = document.getElementById('tasksList');
+        const taskTemplate = document.getElementById('taskTemplate');
+
+        let currentTaskId = null;
+        let isEditingTask = false;
+
+        // Open task modal for adding
+        addTaskBtn.addEventListener('click', () => {
+            const selectedModule = document.getElementById('taskModuleSelect').value;
+            if (!selectedModule) {
+                alert('Please select a module first');
+                return;
+            }
+            
+            document.getElementById('taskModalTitle').textContent = 'Add New Task';
+            document.getElementById('taskTitle').value = '';
+            document.getElementById('taskDescription').value = '';
+            document.getElementById('taskDueDate').value = '';
+            document.getElementById('taskPoints').value = '10';
+            document.getElementById('taskPriority').value = 'medium';
+            
+            currentTaskId = null;
+            isEditingTask = false;
+            taskModal.classList.remove('hidden');
+        });
+
+        // Edit task
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('edit-task') || e.target.closest('.edit-task')) {
+                const taskItem = e.target.closest('.task-item');
+                currentTaskId = taskItem.getAttribute('data-id');
+                
+                // In a real app, you would fetch these values from your data store
+                document.getElementById('taskModalTitle').textContent = 'Edit Task';
+                document.getElementById('taskTitle').value = taskItem.querySelector('.task-title').textContent;
+                document.getElementById('taskDescription').value = taskItem.querySelector('.task-description').textContent;
+                
+                // Extract due date from the displayed text
+                const dueText = taskItem.querySelector('.task-due-date').textContent.replace('Due: ', '');
+                document.getElementById('taskDueDate').value = dueText;
+                
+                // Extract points from the displayed text
+                const pointsText = taskItem.querySelector('.task-points').textContent.replace(' Points', '');
+                document.getElementById('taskPoints').value = pointsText;
+                
+                // Determine priority from class
+                if (taskItem.classList.contains('high-priority')) {
+                    document.getElementById('taskPriority').value = 'high';
+                } else if (taskItem.classList.contains('medium-priority')) {
+                    document.getElementById('taskPriority').value = 'medium';
+                } else {
+                    document.getElementById('taskPriority').value = 'low';
+                }
+                
+                isEditingTask = true;
+                taskModal.classList.remove('hidden');
+            }
+        });
+
+        // Delete task
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('delete-task') || e.target.closest('.delete-task')) {
+                if (confirm('Are you sure you want to delete this task?')) {
+                    e.target.closest('.task-item').remove();
+                    // In a real app, you would also make an API call to delete from the server
+                }
+            }
+        });
+
+        // Save task
+        saveTaskBtn.addEventListener('click', () => {
+            const title = document.getElementById('taskTitle').value;
+            const description = document.getElementById('taskDescription').value;
+            const dueDate = document.getElementById('taskDueDate').value;
+            const points = document.getElementById('taskPoints').value;
+            const priority = document.getElementById('taskPriority').value;
+            
+            if (!title || !dueDate || !points) {
+                alert('Title, Due Date, and Points are required');
+                return;
+            }
+            
+            if (isEditingTask) {
+                // Update existing task
+                const taskItem = document.querySelector(`.task-item[data-id="${currentTaskId}"]`);
+                taskItem.querySelector('.task-title').textContent = title;
+                taskItem.querySelector('.task-description').textContent = description;
+                taskItem.querySelector('.task-due-date').innerHTML = `<i class="fas fa-calendar-alt mr-1 text-gray-500"></i> Due: ${dueDate}`;
+                taskItem.querySelector('.task-points').textContent = `${points} Points`;
+                
+                // Update priority class
+                taskItem.classList.remove('high-priority', 'medium-priority', 'low-priority');
+                taskItem.classList.add(`${priority}-priority`);
+            } else {
+                // Add new task
+                const newTask = taskTemplate.cloneNode(true);
+                newTask.classList.remove('template', 'hidden');
+                const newId = Date.now(); // In a real app, this would come from the server
+                newTask.setAttribute('data-id', newId);
+                newTask.querySelector('.task-title').textContent = title;
+                newTask.querySelector('.task-description').textContent = description;
+                newTask.querySelector('.task-due-date').innerHTML = `<i class="fas fa-calendar-alt mr-1 text-gray-500"></i> Due: ${dueDate}`;
+                newTask.querySelector('.task-points').textContent = `${points} Points`;
+                
+                // Set priority class
+                newTask.classList.remove('high-priority', 'medium-priority', 'low-priority');
+                newTask.classList.add(`${priority}-priority`);
+                
+                // Add event listeners for edit/delete
+                newTask.querySelector('.edit-task').addEventListener('click', (e) => {
+                    currentTaskId = newId;
+                    document.getElementById('taskModalTitle').textContent = 'Edit Task';
+                    document.getElementById('taskTitle').value = title;
+                    document.getElementById('taskDescription').value = description;
+                    document.getElementById('taskDueDate').value = dueDate;
+                    document.getElementById('taskPoints').value = points;
+                    document.getElementById('taskPriority').value = priority;
+                    isEditingTask = true;
+                    taskModal.classList.remove('hidden');
+                });
+                
+                newTask.querySelector('.delete-task').addEventListener('click', (e) => {
+                    if (confirm('Are you sure you want to delete this task?')) {
+                        newTask.remove();
+                    }
+                });
+                
+                tasksList.appendChild(newTask);
+            }
+            
+            taskModal.classList.add('hidden');
+            
+            // Show success notification
+            document.getElementById('successMessage').textContent = isEditingTask ? 'Task updated successfully!' : 'Task added successfully!';
+            successNotification.classList.remove('hidden');
+            
+            // Hide notification after 3 seconds
+            setTimeout(() => {
+                successNotification.classList.add('hidden');
+            }, 3000);
+        });
+
+        // Cancel task edit
+        cancelTaskBtn.addEventListener('click', () => {
+            taskModal.classList.add('hidden');
+        });
+
+        // Close modal when clicking outside
+        window.addEventListener('click', (event) => {
+            if (event.target === taskModal) {
+                taskModal.classList.add('hidden');
+            }
+        });
+
+        // Initialize with modules tab active
+        activateTab(tabs.modules);
+    </script>
+</body>
+</html>

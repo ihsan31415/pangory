@@ -1,0 +1,28 @@
+<!-- Instructor: List course yang dia ajar -->
+<h2>Course yang Saya Ajar</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Judul</th>
+      <th>Status</th>
+      <th>Jumlah Siswa</th>
+      <th>Aksi</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for course in courses %}
+    <tr>
+      <td>{{ course.title }}</td>
+      <td>{{ course.status }}</td>
+      <td>{{ course.student_count }}</td>
+      <td>
+        <a href="{% url 'edit_course' course.id %}">Edit</a>
+        <a href="{% url 'course_modules' course.id %}">Kelola Modul</a>
+        <a href="{% url 'course_tasks' course.id %}">Kelola Tugas</a>
+        <a href="{% url 'course_enrollments' course.id %}">Lihat Siswa</a>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+<a href="{% url 'add_course' %}">Tambah Course Baru</a>

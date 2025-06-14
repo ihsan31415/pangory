@@ -1,0 +1,41 @@
+<!-- Student: List semua course yang tersedia -->
+<h2>Daftar Kursus Tersedia</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Judul</th>
+      <th>Instruktur</th>
+      <th>Status</th>
+      <th>Aksi</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for course in available_courses %}
+    <tr>
+      <td>{{ course.title }}</td>
+      <td>{{ course.instructor.get_full_name }}</td>
+      <td>{{ course.status }}</td>
+      <td>
+        {% if course.is_enrolled %}
+          <a href="{% url 'course_detail' course.id %}">Lihat</a>
+        {% else %}
+          <form method="post" action="{% url 'enroll_course' course.id %}">
+            {% csrf_token %}
+            <button type="submit">Daftar</button>
+          </form>
+        {% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<!-- Student: List course yang sudah di-enroll -->
+<h2>Kursus Saya</h2>
+<ul>
+  {% for course in my_courses %}
+    <li>
+      <a href="{% url 'course_detail' course.id %}">{{ course.title }}</a>
+    </li>
+  {% endfor %}
+</ul>

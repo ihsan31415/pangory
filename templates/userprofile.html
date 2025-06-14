@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Profile - Pangory</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        .avatar-upload {
+            position: relative;
+            max-width: 150px;
+        }
+        .avatar-upload .avatar-edit {
+            position: absolute;
+            right: 10px;
+            bottom: 10px;
+            z-index: 1;
+        }
+        .avatar-upload .avatar-edit input {
+            display: none;
+        }
+        .avatar-upload .avatar-edit label {
+            display: inline-block;
+            width: 36px;
+            height: 36px;
+            margin-bottom: 0;
+            border-radius: 100%;
+            background: #FFFFFF;
+            border: 1px solid #d2d6dc;
+            box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.12);
+            cursor: pointer;
+            font-weight: normal;
+            transition: all 0.2s ease-in-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .avatar-upload .avatar-edit label:hover {
+            background: #f1f1f1;
+            border-color: #d6d6d6;
+        }
+        .avatar-upload .avatar-preview {
+            width: 150px;
+            height: 150px;
+            position: relative;
+            border-radius: 100%;
+            border: 4px solid #F8F8FC;
+            box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
+        }
+        .avatar-upload .avatar-preview > div {
+            width: 100%;
+            height: 100%;
+            border-radius: 100%;
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        @media (max-width: 640px) {
+            .avatar-upload {
+                max-width: 120px;
+                margin: 0 auto;
+            }
+            .avatar-upload .avatar-preview {
+                width: 120px;
+                height: 120px;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gray-100">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 flex items-center">
+                        <i class="fas fa-graduation-cap text-2xl text-cyan-600 mr-2"></i>
+                        <span class="text-xl font-bold text-gray-800">Pangory</span>
+                    </div>
+                </div>
+                
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex items-center space-x-4">
+                    <a href="index.html" class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-cyan-600 transition">Beranda</a>
+                    <a href="#" class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-cyan-600 transition">Kursus Saya</a>
+                    <a href="#" class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-cyan-600 transition">Pencapaian</a>
+                </div>
+                
+                <div class="hidden md:flex items-center space-x-4">
+                    <div class="relative">
+                        <button class="flex items-center space-x-2 focus:outline-none" id="notif-btn">
+                            <div class="h-8 w-8 rounded-full bg-cyan-100 flex items-center justify-center">
+                                <i class="fas fa-bell text-cyan-600"></i>
+                            </div>
+                        </button>
+                        <span class="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-white"></span>
+                    </div>
+                    <div class="relative" id="profile-menu-container">
+                        <button id="user-menu-button" class="flex items-center space-x-2 focus:outline-none">
+                            <img class="h-8 w-8 rounded-full" src="https://randomuser.me/api/portraits/men/32.jpg" alt="User profile">
+                            <span class="text-sm font-medium text-gray-700">{{ user.first_name }} {{ user.last_name }}</span>
+                            <i class="fas fa-chevron-down text-xs ml-1"></i>
+                        </button>
+                        <!-- Dropdown menu -->
+                        <div id="profile-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-20 border border-gray-100">
+                            <a href="{% url 'user_profile' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                                <i class="fas fa-user mr-2"></i> Profil Saya
+                            </a>
+                            <form method="post" action="{% url 'logout' %}">
+                                {% csrf_token %}
+                                <button type="submit" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                                    <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Mobile menu button -->
+                <div class="md:hidden flex items-center">
+                    <button id="mobile-menu-button" class="text-gray-500 hover:text-gray-700 focus:outline-none">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="mobile-menu md:hidden bg-white hidden">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="index.html" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-cyan-600 hover:bg-gray-50">Beranda</a>
+                <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-cyan-600 hover:bg-gray-50">Kursus Saya</a>
+                <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-cyan-600 hover:bg-gray-50">Pencapaian</a>
+                <div class="pt-4 border-t border-gray-200">
+                    <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-cyan-600 hover:bg-gray-50">
+                        <div class="flex items-center">
+                            <div class="h-6 w-6 rounded-full bg-cyan-100 flex items-center justify-center mr-2">
+                                <i class="fas fa-bell text-cyan-600 text-sm"></i>
+                            </div>
+                            Notifikasi
+                        </div>
+                    </a>
+                    <a href="{% url 'user_profile' %}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-cyan-600 hover:bg-gray-50">
+                        <div class="flex items-center">
+                            <img class="h-6 w-6 rounded-full mr-2" src="https://randomuser.me/api/portraits/men/32.jpg" alt="User profile">
+                            Profil Saya
+                        </div>
+                    </a>
+                    <form method="post" action="{% url 'logout' %}">
+                        {% csrf_token %}
+                        <button type="submit" class="w-full text-left block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-cyan-600 hover:bg-gray-50">
+                            <div class="flex items-center">
+                                <div class="h-6 w-6 rounded-full bg-gray-100 flex items-center justify-center mr-2">
+                                    <i class="fas fa-sign-out-alt text-gray-600 text-sm"></i>
+                                </div>
+                                Keluar
+                            </div>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="bg-white shadow rounded-lg overflow-hidden">
+            <!-- Profile Header -->
+            <div class="px-6 py-8 bg-gradient-to-r from-cyan-500 to-blue-500 text-white">
+                <div class="flex flex-col md:flex-row items-center">
+                    <div class="avatar-upload mb-4 md:mb-0 md:mr-6">
+                        <div class="avatar-edit">
+                            <input type='file' id="avatarUpload" accept=".png, .jpg, .jpeg" />
+                            <label for="avatarUpload">
+                                <i class="fas fa-camera text-gray-700"></i>
+                            </label>
+                        </div>
+                        <div class="avatar-preview">
+                            <div id="avatarPreview" style="background-image: url('https://randomuser.me/api/portraits/men/32.jpg');"></div>
+                        </div>
+                    </div>
+                    <div class="text-center md:text-left">
+                        <h1 class="text-2xl font-bold">{{ user.first_name }} {{ user.last_name }}</h1>
+                        <p class="text-cyan-100">{{ user.role }}</p>
+                        <div class="mt-2 flex flex-wrap justify-center md:justify-start gap-2">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-white bg-opacity-20 text-white">
+                                <i class="fas fa-medal mr-1"></i> Gold Member
+                            </span>
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-white bg-opacity-20 text-white">
+                                <i class="fas fa-check-circle mr-1"></i> Verified
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Content -->
+            <div class="px-6 py-6">
+                <div class="mb-8">
+                    <h2 class="text-lg font-medium text-gray-900 mb-4">Informasi Profil</h2>
+                    <form class="space-y-6" method="post" action="{% url 'user_profile' %}">
+                        {% csrf_token %}
+                        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                            <!-- First Name -->
+                            <div>
+                                <label for="first_name" class="block text-sm font-medium text-gray-700">Nama Depan</label>
+                                <input type="text" name="first_name" id="first_name" autocomplete="given-name" 
+                                    class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-cyan-500 focus:border-cyan-500" 
+                                    value="{{ user.first_name }}">
+                            </div>
+
+                            <!-- Last Name -->
+                            <div>
+                                <label for="last_name" class="block text-sm font-medium text-gray-700">Nama Belakang</label>
+                                <input type="text" name="last_name" id="last_name" autocomplete="family-name" 
+                                    class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-cyan-500 focus:border-cyan-500" 
+                                    value="{{ user.last_name }}">
+                            </div>
+
+                            <!-- Email -->
+                            <div>
+                                <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+                                <input type="email" name="email" id="email" autocomplete="email" 
+                                    class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-cyan-500 focus:border-cyan-500" 
+                                    value="{{ user.email }}" readonly>
+                            </div>
+
+                            <!-- Username -->
+                            <div>
+                                <label for="username" class="block text-sm font-medium text-gray-700">Username</label>
+                                <input type="text" name="username" id="username" autocomplete="username" 
+                                    class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-cyan-500 focus:border-cyan-500" 
+                                    value="{{ user.username }}" readonly>
+                            </div>
+
+                            <!-- Date of Birth -->
+                            <div>
+                                <label for="dob" class="block text-sm font-medium text-gray-700">Tanggal Lahir</label>
+                                <input type="date" name="dob" id="dob" 
+                                    class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-cyan-500 focus:border-cyan-500"
+                                    value="{{ user.profile.date_of_birth|date:'Y-m-d' }}">
+                            </div>
+
+                            <!-- Phone Number -->
+                            <div>
+                                <label for="phone" class="block text-sm font-medium text-gray-700">Nomor Telepon</label>
+                                <input type="tel" name="phone" id="phone" autocomplete="tel" 
+                                    class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-cyan-500 focus:border-cyan-500" 
+                                    placeholder="+62 812-3456-7890" value="{{ user.profile.phone_number }}">
+                            </div>
+                        </div>
+
+                        <!-- Address -->
+                        <div>
+                            <label for="address" class="block text-sm font-medium text-gray-700">Alamat</label>
+                            <textarea id="address" name="address" rows="3" 
+                                class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-cyan-500 focus:border-cyan-500" 
+                                placeholder="Jl. Contoh No. 123, Jakarta">{{ user.profile.address }}</textarea>
+                        </div>
+
+                        <!-- Bio -->
+                        <div>
+                            <label for="bio" class="block text-sm font-medium text-gray-700">Bio</label>
+                            <textarea id="bio" name="bio" rows="3" 
+                                class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-cyan-500 focus:border-cyan-500" 
+                                placeholder="Ceritakan sedikit tentang diri Anda">{{ user.profile.bio }}</textarea>
+                        </div>
+
+                        <!-- Password Section -->
+                        <div class="border-t border-gray-200 pt-6">
+                            <h3 class="text-lg font-medium text-gray-900 mb-4">Ubah Password</h3>
+                            <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                                <div>
+                                    <label for="current_password" class="block text-sm font-medium text-gray-700">Password Saat Ini</label>
+                                    <input type="password" name="current_password" id="current_password" 
+                                        class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-cyan-500 focus:border-cyan-500" 
+                                        placeholder="••••••••">
+                                </div>
+                                <div>
+                                    <label for="new_password" class="block text-sm font-medium text-gray-700">Password Baru</label>
+                                    <input type="password" name="new_password" id="new_password" 
+                                        class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-cyan-500 focus:border-cyan-500" 
+                                        placeholder="••••••••">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="flex justify-end space-x-3 pt-6 border-t border-gray-200">
+                            <button type="button" class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500">
+                                Batal
+                            </button>
+                            <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500">
+                                Simpan Perubahan
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Mobile menu toggle
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        
+        mobileMenuButton.addEventListener('click', function() {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // Avatar upload preview
+        function readURL(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('avatarPreview').style.backgroundImage = 'url('+e.target.result +')';
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+        
+        document.getElementById("avatarUpload").addEventListener('change', function() {
+            readURL(this);
+        });
+
+        // Dropdown profile menu
+        const userMenuButton = document.getElementById('user-menu-button');
+        const profileDropdown = document.getElementById('profile-dropdown');
+        const profileMenuContainer = document.getElementById('profile-menu-container');
+        userMenuButton.addEventListener('click', function(e) {
+            e.stopPropagation();
+            profileDropdown.classList.toggle('hidden');
+        });
+        document.addEventListener('click', function(e) {
+            if (!profileMenuContainer.contains(e.target)) {
+                profileDropdown.classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+</html>

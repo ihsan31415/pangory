@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login - Pangory</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #06b6d4 0%, #ec4899 100%);
+        }
+        .form-card {
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.8);
+        }
+        .input-focus:focus {
+            box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.3);
+        }
+    </style>
+</head>
+<body class="min-h-screen gradient-bg flex items-center justify-center p-4">
+    <div class="form-card max-w-md w-full rounded-2xl shadow-xl overflow-hidden border border-white/30">
+        <!-- Header -->
+        <div class="bg-white px-6 py-4 border-b border-gray-200">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                    <i class="fas fa-graduation-cap text-2xl text-cyan-600 mr-2"></i>
+                    <span class="text-xl font-bold text-gray-800">Pangory</span>
+                </div>
+                <a href="/register" class="text-sm text-cyan-600 hover:text-cyan-700 font-medium">Tidak ada akun? Daftar</a>
+            </div>
+            <h2 class="mt-4 text-2xl font-bold text-gray-800">Masuk ke Akun Anda</h2>
+        </div>
+        
+        <!-- Form -->
+        <form class="p-6 space-y-5" method="post" action="{% url 'login' %}">
+            {% csrf_token %}
+            <!-- Email -->
+            <div>
+                <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-envelope text-gray-400"></i>
+                    </div>
+                    <input 
+                        type="email" 
+                        id="email" 
+                        name="email"
+                        required
+                        class="pl-10 w-full py-3 rounded-lg border-gray-300 focus:border-cyan-500 focus:ring-cyan-500 shadow-sm input-focus transition"
+                        placeholder="email@contoh.com">
+                </div>
+            </div>
+            
+            <!-- Password -->
+            <div>
+                <div class="flex items-center justify-between mb-1">
+                    <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+                    <a href="forgot-password.html" class="text-xs text-cyan-600 hover:text-cyan-700 font-medium">Lupa password?</a>
+                </div>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-lock text-gray-400"></i>
+                    </div>
+                    <input 
+                        type="password" 
+                        id="password" 
+                        name="password"
+                        required
+                        class="pl-10 w-full py-3 rounded-lg border-gray-300 focus:border-cyan-500 focus:ring-cyan-500 shadow-sm input-focus transition"
+                        placeholder="••••••••">
+                </div>
+            </div>
+            
+            <!-- Remember Me -->
+            <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                    <input 
+                        id="remember" 
+                        name="remember" 
+                        type="checkbox" 
+                        class="h-4 w-4 text-cyan-600 focus:ring-cyan-500 border-gray-300 rounded">
+                    <label for="remember" class="ml-2 block text-sm text-gray-700">
+                        Ingat saya
+                    </label>
+                </div>
+            </div>
+            
+            <!-- Submit Button -->
+            <button
+                type="submit"
+                class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 transition">
+                <i class="fas fa-sign-in-alt mr-2"></i> Masuk
+            </button>
+        </form>
+        
+        <!-- Social Login -->
+        <div class="px-6 pb-6">
+            <div class="relative">
+                <div class="absolute inset-0 flex items-center">
+                    <div class="w-full border-t border-gray-300"></div>
+                </div>
+                <div class="relative flex justify-center text-sm">
+                    <span class="px-2 bg-white text-gray-500">Atau masuk dengan</span>
+                </div>
+            </div>
+            
+            <div class="mt-6 grid grid-cols-2 gap-3">
+                <a href="#" class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition">
+                    <i class="fab fa-google text-red-500 mr-2 mt-0.5"></i> Google
+                </a>
+                <a href="#" class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition">
+                    <i class="fab fa-facebook-f text-blue-600 mr-2 mt-0.5"></i> Facebook
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simple form validation
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            if (!email || !password) {
+                e.preventDefault();
+                alert('Harap isi email dan password!');
+            }
+        });
+    </script>
+</body>
+</html>
