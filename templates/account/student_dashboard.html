@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block title %}Dashboard Student - Pangory{% endblock %}
+{% block content %}
+<div class="hero-gradient">
+    <div class="max-w-7xl mx-auto py-10 px-4 sm:py-14 sm:px-6 lg:py-20 lg:px-8">
+        <div class="text-center">
+            <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white">
+                <span class="block">Dashboard Siswa</span>
+            </h1>
+            <p class="mt-4 max-w-lg mx-auto text-lg sm:text-xl text-cyan-100">
+                Selamat datang di dashboard! Lihat progres belajar, kursus yang diikuti, dan notifikasi terbaru.
+            </p>
+        </div>
+    </div>
+</div>
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-16 relative z-10">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="card bg-white rounded-lg shadow p-6 flex flex-col items-center">
+            <div class="h-12 w-12 flex items-center justify-center rounded-full bg-cyan-100 mb-3">
+                <i class="fas fa-book text-cyan-600 text-2xl"></i>
+            </div>
+            <div class="text-2xl font-bold text-gray-800">{{ my_courses|length }}</div>
+            <div class="text-gray-500">Kursus Diikuti</div>
+        </div>
+        <div class="card bg-white rounded-lg shadow p-6 flex flex-col items-center">
+            <div class="h-12 w-12 flex items-center justify-center rounded-full bg-pink-100 mb-3">
+                <i class="fas fa-chart-line text-pink-600 text-2xl"></i>
+            </div>
+            <div class="text-2xl font-bold text-gray-800">
+                {% if progress_percent %}{{ progress_percent }}%{% else %}0%{% endif %}
+            </div>
+            <div class="text-gray-500">Progress Belajar</div>
+        </div>
+        <div class="card bg-white rounded-lg shadow p-6 flex flex-col items-center">
+            <div class="h-12 w-12 flex items-center justify-center rounded-full bg-purple-100 mb-3">
+                <i class="fas fa-certificate text-purple-600 text-2xl"></i>
+            </div>
+            <div class="text-2xl font-bold text-gray-800">{{ certificates|length }}</div>
+            <div class="text-gray-500">Sertifikat</div>
+        </div>
+        <div class="card bg-white rounded-lg shadow p-6 flex flex-col items-center">
+            <div class="h-12 w-12 flex items-center justify-center rounded-full bg-yellow-100 mb-3">
+                <i class="fas fa-bell text-yellow-500 text-2xl"></i>
+            </div>
+            <div class="text-2xl font-bold text-gray-800">{{ notifications|length }}</div>
+            <div class="text-gray-500">Notifikasi</div>
+        </div>
+    </div>
+</div>
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
+    <div class="mb-6 flex items-center justify-between">
+        <h2 class="text-2xl font-bold text-gray-800">Kursus Saya</h2>
+        <a href="{% url 'my_courses' %}" class="text-cyan-600 hover:underline font-medium">Lihat Semua</a>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for course in my_courses %}
+        <div class="bg-white rounded-lg shadow p-5 flex flex-col">
+            {% if course.thumbnail %}
+                <img src="{{ course.thumbnail.url }}" alt="Thumbnail" class="h-32 w-full object-cover rounded-lg mb-4">
+            {% else %}
+                <div class="h-32 bg-cyan-500 rounded-lg flex items-center justify-center mb-4">
+                    <i class="fas fa-book text-white text-4xl"></i>
+                </div>
+            {% endif %}
+            <h3 class="text-lg font-bold text-gray-900 mb-2">{{ course.title }}</h3>
+            <div class="text-gray-500 text-sm mb-4">
+                Progress: 
+                {% if course.progress_percent %}{{ course.progress_percent }}%{% else %}0%{% endif %}
+            </div>
+            <a href="{% url 'course_detail' course.id %}" class="mt-auto inline-block px-4 py-2 rounded-md bg-cyan-600 text-white font-medium hover:bg-cyan-700 transition">Lanjutkan Belajar</a>
+        </div>
+        {% empty %}
+        <div class="col-span-3 text-gray-500 text-center">Belum ada kursus yang diikuti.</div>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 mb-16">
+    <div class="mb-6 flex items-center justify-between">
+        <h2 class="text-2xl font-bold text-gray-800">Notifikasi</h2>
+        <a href="#" class="text-cyan-600 hover:underline font-medium">Lihat Semua</a>
+    </div>
+    <div class="space-y-4">
+        {% for notif in notifications %}
+        <div class="bg-white rounded-lg shadow p-4 flex items-center">
+            <div class="h-10 w-10 flex items-center justify-center rounded-full bg-yellow-100 mr-4">
+                <i class="fas fa-bell text-yellow-500 text-xl"></i>
+            </div>
+            <div>
+                <div class="font-medium text-gray-900">{{ notif.message }}</div>
+                <div class="text-gray-500 text-sm">{{ notif.timestamp|timesince }} yang lalu</div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="text-gray-400 text-center">Belum ada notifikasi.</div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

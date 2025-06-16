@@ -20,7 +20,7 @@ def student_course_list(request):
         my_courses = []
         for course in available_courses:
             course.is_enrolled = False
-    return render(request, 'courses/student_course_list.html', {
+    return render(request, 'layout/student_course_list.html', {
         'available_courses': available_courses,
         'my_courses': my_courses,
     })

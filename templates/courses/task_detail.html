@@ -1,53 +1,45 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>{{ task.title }} - Tugas</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-</head>
-<body class="bg-gray-50">
-    <div class="max-w-2xl mx-auto py-8 px-4">
-        <a href="{% url 'course_detail' course.id %}" class="text-cyan-600 hover:underline mb-4 inline-block"><i class="fas fa-arrow-left"></i> Kembali ke Kursus</a>
-        <div class="bg-white rounded-lg shadow p-6">
-            <h1 class="text-2xl font-bold mb-2">{{ task.title }}</h1>
-            <p class="text-gray-700 mb-4">{{ task.description }}</p>
-            {% if task.due_date %}
-                <div class="mb-4 text-sm text-red-600"><i class="fas fa-clock mr-1"></i>Deadline: {{ task.due_date|date:"d M Y H:i" }}</div>
-            {% endif %}
-            <div class="mb-6">
-                <span class="text-sm text-gray-500">Poin: {{ task.points }}</span>
-            </div>
-            <hr class="my-4">
-            <h2 class="text-lg font-semibold mb-2">Kirim Jawaban</h2>
-            {% if submission %}
-                <div class="mb-4 p-3 bg-green-50 border border-green-200 rounded">
-                    <div class="font-semibold text-green-700 mb-1">Kamu sudah mengumpulkan tugas ini.</div>
-                    <div class="text-sm text-gray-700 mb-1">Jawaban: {{ submission.answer_text|linebreaks }}</div>
-                    {% if submission.answer_file %}
-                        <div class="text-sm">File: <a href="{{ submission.answer_file.url }}" class="text-cyan-600 hover:underline" target="_blank">Download</a></div>
-                    {% endif %}
-                    <div class="text-xs text-gray-400 mt-2">Terakhir diupdate: {{ submission.updated_at|date:"d M Y H:i" }}</div>
-                </div>
-                <div class="mb-2 text-sm text-gray-500">Kamu bisa mengupdate jawaban di bawah ini:</div>
-            {% endif %}
-            <form method="post" enctype="multipart/form-data" class="space-y-4">
-                {% csrf_token %}
-                <div>
-                    <label for="answer_text" class="block text-sm font-medium text-gray-700">Jawaban Teks</label>
-                    <textarea id="answer_text" name="answer_text" rows="4" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm" required>{{ submission.answer_text|default_if_none:'' }}</textarea>
-                </div>
-                <div>
-                    <label for="answer_file" class="block text-sm font-medium text-gray-700">Upload File (opsional)</label>
-                    <input type="file" id="answer_file" name="answer_file" class="mt-1 block w-full text-sm text-gray-700">
-                    {% if submission.answer_file %}
-                        <div class="text-xs mt-1">File sebelumnya: <a href="{{ submission.answer_file.url }}" class="text-cyan-600 hover:underline" target="_blank">Download</a></div>
-                    {% endif %}
-                </div>
-                <button type="submit" class="px-4 py-2 bg-cyan-600 text-white rounded hover:bg-cyan-700">Kirim Jawaban</button>
-            </form>
+{% extends "base.html" %}
+{% block title %}{{ task.title }} - Tugas{% endblock %}
+{% block content %}
+<div class="max-w-2xl mx-auto py-8 px-4">
+    <a href="{% url 'course_detail' course.id %}" class="text-cyan-600 hover:underline mb-4 inline-block"><i class="fas fa-arrow-left"></i> Kembali ke Kursus</a>
+    <div class="bg-white rounded-lg shadow p-6">
+        <h1 class="text-2xl font-bold mb-2">{{ task.title }}</h1>
+        <p class="text-gray-700 mb-4">{{ task.description }}</p>
+        {% if task.due_date %}
+            <div class="mb-4 text-sm text-red-600"><i class="fas fa-clock mr-1"></i>Deadline: {{ task.due_date|date:"d M Y H:i" }}</div>
+        {% endif %}
+        <div class="mb-6">
+            <span class="text-sm text-gray-500">Poin: {{ task.points }}</span>
         </div>
+        <hr class="my-4">
+        <h2 class="text-lg font-semibold mb-2">Kirim Jawaban</h2>
+        {% if submission %}
+            <div class="mb-4 p-3 bg-green-50 border border-green-200 rounded">
+                <div class="font-semibold text-green-700 mb-1">Kamu sudah mengumpulkan tugas ini.</div>
+                <div class="text-sm text-gray-700 mb-1">Jawaban: {{ submission.answer_text|linebreaks }}</div>
+                {% if submission.answer_file %}
+                    <div class="text-sm">File: <a href="{{ submission.answer_file.url }}" class="text-cyan-600 hover:underline" target="_blank">Download</a></div>
+                {% endif %}
+                <div class="text-xs text-gray-400 mt-2">Terakhir diupdate: {{ submission.updated_at|date:"d M Y H:i" }}</div>
+            </div>
+            <div class="mb-2 text-sm text-gray-500">Kamu bisa mengupdate jawaban di bawah ini:</div>
+        {% endif %}
+        <form method="post" enctype="multipart/form-data" class="space-y-4">
+            {% csrf_token %}
+            <div>
+                <label for="answer_text" class="block text-sm font-medium text-gray-700">Jawaban Teks</label>
+                <textarea id="answer_text" name="answer_text" rows="4" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm" required>{{ submission.answer_text|default_if_none:'' }}</textarea>
+            </div>
+            <div>
+                <label for="answer_file" class="block text-sm font-medium text-gray-700">Upload File (opsional)</label>
+                <input type="file" id="answer_file" name="answer_file" class="mt-1 block w-full text-sm text-gray-700">
+                {% if submission.answer_file %}
+                    <div class="text-xs mt-1">File sebelumnya: <a href="{{ submission.answer_file.url }}" class="text-cyan-600 hover:underline" target="_blank">Download</a></div>
+                {% endif %}
+            </div>
+            <button type="submit" class="px-4 py-2 bg-cyan-600 text-white rounded hover:bg-cyan-700">Kirim Jawaban</button>
+        </form>
     </div>
-</body>
-</html>
+</div>
+{% endblock %}

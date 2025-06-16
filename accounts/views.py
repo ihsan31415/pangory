@@ -11,10 +11,10 @@ def register(request):
         role = request.POST['role'].upper()
         if User.objects.filter(email=email).exists():
             messages.error(request, "Email sudah digunakan.")
-            return render(request, 'register.html')
+            return render(request, 'auth/register.html')
         if User.objects.filter(username=username).exists():
             messages.error(request, "Username sudah digunakan.")
-            return render(request, 'register.html')
+            return render(request, 'auth/register.html')
         user = User.objects.create_user(
             email=email,
             username=username,
@@ -23,7 +23,7 @@ def register(request):
         )
         messages.success(request, "Registrasi berhasil! Silakan login.")
         return redirect('login')
-    return render(request, 'register.html')
+    return render(request, 'auth/register.html')
 
 from django.contrib.auth import authenticate, login
 
@@ -37,7 +37,7 @@ def login_view(request):
             return redirect('user_profile') 
         else:
             messages.error(request, "Email atau password salah.")
-    return render(request, 'login.html')
+    return render(request, 'auth/login.html')
 
 @login_required
 def user_profile(request):
@@ -60,7 +60,7 @@ def user_profile(request):
                 user.set_password(new_password)
             else:
                 messages.error(request, "Password saat ini salah.")
-                return render(request, 'userprofile.html', {'user': user})
+                return render(request, 'account/userprofile.html', {'user': user})
 
         # Debug Avatar Upload
         print("FILES:", request.FILES)
@@ -84,9 +84,9 @@ def user_profile(request):
         except Exception as e:
             print(f"Error saving user/profile: {e}")
             messages.error(request, f"Error saving profile: {e}")
-            return render(request, 'userprofile.html', {'user': user})
+            return render(request, 'account/userprofile.html', {'user': user})
 
         messages.success(request, "Profil berhasil diperbarui.")
         return redirect('user_profile')
     
-    return render(request, 'userprofile.html', {'user': user})
+    return render(request, 'account/userprofile.html', {'user': user})

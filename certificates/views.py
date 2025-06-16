@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from .models import Certificate
-from courses.models import Course
+from certificates.models import Certificate
+from courses.models import Course, Enrollment
 from django.http import FileResponse, Http404
 import os
 from django.conf import settings

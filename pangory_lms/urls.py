@@ -38,7 +38,7 @@ urlpatterns = [
     path('', views.index, name='index'),
     path('about/', views.about, name='about'),
     path('contact/', views.contact_view, name='contact'),
-    path('logout/', LogoutView.as_view(next_page='login'), name='logout'),
+    path('logout/', LogoutView.as_view(next_page='/'), name='logout'),
     # student
     path('courses/', courses_views.student_course_list, name='student_course_list'),
     path('courses/enroll/<int:course_id>/', courses_views.enroll_course, name='enroll_course'),

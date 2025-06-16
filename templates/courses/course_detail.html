@@ -1,229 +1,90 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>{{ course.title }} - Detail Kursus</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome CDN -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-</head>
-<body class="bg-gray-50">
-    <!-- Navigation -->
-    <nav class="bg-white shadow-sm">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16">
-                <div class="flex items-center">
-                    <div class="flex-shrink-0 flex items-center">
-                        <i class="fas fa-graduation-cap text-2xl text-cyan-600 mr-2"></i>
-                        <span class="text-xl font-bold text-gray-800">Pangory</span>
-                    </div>
-                </div>
-                
-                <!-- Desktop Menu -->
-                <div class="hidden md:flex items-center space-x-4">
-                    <a href="/" class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-cyan-600 transition">Beranda</a>
-                    <a href="/courses/my" class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-cyan-600 transition">Kursus Saya</a>
-                    <a href="#" class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-cyan-600 transition">Pencapaian</a>
-                </div>
-                
-                <div class="hidden md:flex items-center space-x-4">
-                    <div class="relative">
-                        <button class="flex items-center space-x-2 focus:outline-none" id="notif-btn">
-                            <div class="h-8 w-8 rounded-full bg-cyan-100 flex items-center justify-center">
-                                <i class="fas fa-bell text-cyan-600"></i>
-                            </div>
-                        </button>
-                        <span class="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-white"></span>
-                    </div>
-                    <div class="relative" id="profile-menu-container">
-                        <button id="user-menu-button" class="flex items-center space-x-2 focus:outline-none">
-                            <img class="h-8 w-8 rounded-full" src="{% if user.profile.avatar %}{{ user.profile.avatar.url }}{% else %}https://randomuser.me/api/portraits/men/32.jpg{% endif %}" alt="User profile">
-                            <span class="text-sm font-medium text-gray-700">{{ user.first_name }} {{ user.last_name }}</span>
-                            <i class="fas fa-chevron-down text-xs ml-1"></i>
-                        </button>
-                        <!-- Dropdown menu -->
-                        <div id="profile-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-20 border border-gray-100">
-                            <a href="{% url 'user_profile' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                                <i class="fas fa-user mr-2"></i> Profil Saya
-                            </a>
-                            <form method="post" action="{% url 'logout' %}">
-                                {% csrf_token %}
-                                <button type="submit" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                                    <i class="fas fa-sign-out-alt mr-2"></i> Logout
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Mobile menu button -->
-                <div class="md:hidden flex items-center">
-                    <button id="mobile-menu-button" class="text-gray-500 hover:text-gray-700 focus:outline-none">
-                        <i class="fas fa-bars text-xl"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Mobile Menu -->
-        <div id="mobile-menu" class="mobile-menu md:hidden bg-white hidden">
-            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-                <a href="/" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-cyan-600 hover:bg-gray-50">Beranda</a>
-                <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-cyan-600 hover:bg-gray-50">Kursus Saya</a>
-                <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-cyan-600 hover:bg-gray-50">Pencapaian</a>
-                <div class="pt-4 border-t border-gray-200">
-                    <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-cyan-600 hover:bg-gray-50">
-                        <div class="flex items-center">
-                            <div class="h-6 w-6 rounded-full bg-cyan-100 flex items-center justify-center mr-2">
-                                <i class="fas fa-bell text-cyan-600 text-sm"></i>
-                            </div>
-                            Notifikasi
-                        </div>
-                    </a>
-                    <a href="{% url 'user_profile' %}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-cyan-600 hover:bg-gray-50">
-                        <div class="flex items-center">
-                            <img class="h-6 w-6 rounded-full mr-2" src="{% if user.profile.avatar %}{{ user.profile.avatar.url }}{% else %}https://randomuser.me/api/portraits/men/32.jpg{% endif %}" alt="User profile">
-                            Profil Saya
-                        </div>
-                    </a>
-                    <form method="post" action="{% url 'logout' %}">
-                        {% csrf_token %}
-                        <button type="submit" class="w-full text-left block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-cyan-600 hover:bg-gray-50">
-                            <div class="flex items-center">
-                                <div class="h-6 w-6 rounded-full bg-gray-100 flex items-center justify-center mr-2">
-                                    <i class="fas fa-sign-out-alt text-gray-600 text-sm"></i>
-                                </div>
-                                Keluar
-                            </div>
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </nav>
+{% extends "base.html" %}
+{% block title %}{{ course.title }} - Detail Kursus{% endblock %}
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ course.title }}</h1>
+    <div class="flex items-center mb-2">
+        <i class="fas fa-chalkboard-teacher text-cyan-600 mr-2"></i>
+        <span class="text-gray-700">{{ course.instructor.get_full_name }}</span>
+    </div>
+    <p class="text-lg text-gray-600 mb-4">{{ course.description }}</p>
+    {% if course.thumbnail %}
+        <img src="{{ course.thumbnail.url }}" alt="Thumbnail" class="rounded-lg mb-4 max-h-64">
+    {% endif %}
+    <div class="flex space-x-4 text-sm text-gray-500 mb-8">
+        <span><i class="fas fa-users mr-1"></i> {{ student_count }} peserta</span>
+        <span><i class="fas fa-layer-group mr-1"></i> {{ course.module_count }} modul</span>
+        <span><i class="fas fa-calendar-alt mr-1"></i> Dibuat: {{ course.created_at|date:"d M Y" }}</span>
+    </div>
 
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <!-- Course Header -->
-        <div class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ course.title }}</h1>
-            <div class="flex items-center mb-2">
-                <i class="fas fa-chalkboard-teacher text-cyan-600 mr-2"></i>
-                <span class="text-gray-700">{{ course.instructor.get_full_name }}</span>
-            </div>
-            <p class="text-lg text-gray-600 mb-4">{{ course.description }}</p>
-            {% if course.thumbnail %}
-                <img src="{{ course.thumbnail.url }}" alt="Thumbnail" class="rounded-lg mb-4 max-h-64">
-            {% endif %}
-            <div class="flex space-x-4 text-sm text-gray-500">
-                <span><i class="fas fa-users mr-1"></i> {{ student_count }} peserta</span>
-                <span><i class="fas fa-layer-group mr-1"></i> {{ course.module_count }} modul</span>
-                <span><i class="fas fa-calendar-alt mr-1"></i> Dibuat: {{ course.created_at|date:"d M Y" }}</span>
-            </div>
-        </div>
-
-        <div class="flex flex-col sm:flex-row sm:items-center sm:space-x-4 mt-8 mb-8 space-y-3 sm:space-y-0">
-            <a href="{% url 'course_discussion' course.id %}" class="inline-flex items-center px-4 py-2 bg-cyan-600 text-white rounded hover:bg-cyan-700 transition">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:space-x-4 mt-8 mb-8 space-y-3 sm:space-y-0">
+        <a href="{% url 'course_discussion' course.id %}" class="inline-flex items-center px-4 py-2 bg-cyan-600 text-white rounded hover:bg-cyan-700 transition">
             <i class="fas fa-comments mr-2"></i> Diskusi Kursus
-            </a>
-            <a href="{% url 'exam_list' course.id %}" class="inline-flex items-center px-4 py-2 bg-cyan-500 text-white rounded hover:bg-cyan-700 transition">
+        </a>
+        <a href="{% url 'exam_list' course.id %}" class="inline-flex items-center px-4 py-2 bg-cyan-500 text-white rounded hover:bg-cyan-700 transition">
             <i class="fas fa-file-alt mr-2"></i> Lihat Ujian
-            </a>
-            <a href="{% url 'certificate_list' course.id %}" class="inline-flex items-center px-4 py-2 bg-white text-cyan-600 rounded border border-cyan-200 hover:underline hover:bg-cyan-50 transition">
+        </a>
+        <a href="{% url 'certificate_list' course.id %}" class="inline-flex items-center px-4 py-2 bg-white text-cyan-600 rounded border border-cyan-200 hover:underline hover:bg-cyan-50 transition">
             <i class="fas fa-certificate mr-2"></i> Lihat Sertifikat Saya
-            </a>
-        </div>
-
-        
-
-        <!-- Modules & Materials -->
-        <div class="mb-10">
-            <h2 class="text-2xl font-bold text-gray-900 mb-4">Modul & Materi</h2>
-            {% if modules %}
-                <div class="space-y-6">
-                    {% for module in modules %}
-                        <div class="bg-white rounded-lg shadow p-4">
-                            <h3 class="text-xl font-semibold text-cyan-700 mb-2">{{ module.title }}</h3>
-                            <p class="text-gray-600 mb-2">{{ module.description }}</p>
-                            {% if module.materials.all %}
-                                <ul class="list-disc ml-6">
-                                    {% for material in module.materials.all %}
-                                        <li class="mb-1">
-                                            <span class="font-medium">{{ material.title }}</span>
-                                            <span class="text-xs text-gray-500 ml-2">({{ material.get_type_display }})</span>
-                                            {% if material.url %}
-                                                <a href="{{ material.url }}" class="text-cyan-600 hover:underline ml-2" target="_blank">Lihat</a>
-                                            {% elif material.file %}
-                                                <a href="{{ material.file.url }}" class="text-cyan-600 hover:underline ml-2" target="_blank">Download</a>
-                                            {% endif %}
-                                        </li>
-                                    {% endfor %}
-                                </ul>
-                            {% else %}
-                                <p class="text-gray-400 text-sm">Belum ada materi.</p>
-                            {% endif %}
-                        </div>
-                    {% endfor %}
-                </div>
-            {% else %}
-                <p class="text-gray-500">Belum ada modul pada kursus ini.</p>
-            {% endif %}
-        </div>
-
-        <!-- Tasks -->
-        <div>
-            <h2 class="text-2xl font-bold text-gray-900 mb-4">Tugas</h2>
-            {% if tasks %}
-                <ul class="space-y-4">
-                    {% for task in tasks %}
-                        <li class="bg-white rounded-lg shadow p-4">
-                            <div class="flex justify-between items-center">
-                                <div>
-                                    <h4 class="text-lg font-semibold text-gray-800">
-                                        <a href="{% url 'task_detail' course.id task.id %}" class="text-cyan-700 hover:underline">{{ task.title }}</a>
-                                    </h4>
-                                    <p class="text-gray-600">{{ task.description|truncatewords:20 }}</p>
-                                </div>
-                                {% if task.due_date %}
-                                    <span class="text-sm text-red-600"><i class="fas fa-clock mr-1"></i>Deadline: {{ task.due_date|date:"d M Y H:i" }}</span>
-                                {% endif %}
-                            </div>
-                        </li>
-                    {% endfor %}
-                </ul>
-            {% else %}
-                <p class="text-gray-500">Belum ada tugas pada kursus ini.</p>
-            {% endif %}
-        </div>
-
-        <!-- untuk admin dan instructor -->
-        <a href="{% url 'course_enrolled_students' course.id %}" class="text-cyan-600 hover:underline text-sm ml-2">
-            Lihat daftar peserta
         </a>
     </div>
-<script>
-    // Mobile menu toggle
-    const mobileMenuButton = document.getElementById('mobile-menu-button');
-    const mobileMenu = document.getElementById('mobile-menu');
-    
-    mobileMenuButton.addEventListener('click', function() {
-        mobileMenu.classList.toggle('hidden');
-    });
 
-    // Dropdown profile menu
-    const userMenuButton = document.getElementById('user-menu-button');
-    const profileDropdown = document.getElementById('profile-dropdown');
-    const profileMenuContainer = document.getElementById('profile-menu-container');
-    userMenuButton.addEventListener('click', function(e) {
-        e.stopPropagation();
-        profileDropdown.classList.toggle('hidden');
-    });
-    document.addEventListener('click', function(e) {
-        if (!profileMenuContainer.contains(e.target)) {
-            profileDropdown.classList.add('hidden');
-        }
-    });
-</script>
-</body>
-</html>
+    <h2 class="text-2xl font-bold text-gray-900 mb-4">Modul & Materi</h2>
+    {% if modules %}
+        <div class="space-y-6 mb-10">
+            {% for module in modules %}
+                <div class="bg-white rounded-lg shadow p-4">
+                    <h3 class="text-xl font-semibold text-cyan-700 mb-2">{{ module.title }}</h3>
+                    <p class="text-gray-600 mb-2">{{ module.description }}</p>
+                    {% if module.materials.all %}
+                        <ul class="list-disc ml-6">
+                            {% for material in module.materials.all %}
+                                <li class="mb-1">
+                                    <span class="font-medium">{{ material.title }}</span>
+                                    <span class="text-xs text-gray-500 ml-2">({{ material.get_type_display }})</span>
+                                    {% if material.url %}
+                                        <a href="{{ material.url }}" class="text-cyan-600 hover:underline ml-2" target="_blank">Lihat</a>
+                                    {% elif material.file %}
+                                        <a href="{{ material.file.url }}" class="text-cyan-600 hover:underline ml-2" target="_blank">Download</a>
+                                    {% endif %}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="text-gray-400 text-sm">Belum ada materi.</p>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="text-gray-500 mb-10">Belum ada modul pada kursus ini.</p>
+    {% endif %}
+
+    <h2 class="text-2xl font-bold text-gray-900 mb-4">Tugas</h2>
+    {% if tasks %}
+        <ul class="space-y-4">
+            {% for task in tasks %}
+                <li class="bg-white rounded-lg shadow p-4">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h4 class="text-lg font-semibold text-gray-800">
+                                <a href="{% url 'task_detail' course.id task.id %}" class="text-cyan-700 hover:underline">{{ task.title }}</a>
+                            </h4>
+                            <p class="text-gray-600">{{ task.description|truncatewords:20 }}</p>
+                        </div>
+                        {% if task.due_date %}
+                            <span class="text-sm text-red-600"><i class="fas fa-clock mr-1"></i>Deadline: {{ task.due_date|date:"d M Y H:i" }}</span>
+                        {% endif %}
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p class="text-gray-500">Belum ada tugas pada kursus ini.</p>
+    {% endif %}
+
+    <a href="{% url 'course_enrolled_students' course.id %}" class="text-cyan-600 hover:underline text-sm ml-2">
+        Lihat daftar peserta
+    </a>
+</div>
+{% endblock %}
