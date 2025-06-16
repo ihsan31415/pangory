@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Sertifikat - {{ course.title }}{% endblock %}
+{% block content %}
+<div class="max-w-xl mx-auto py-8 text-center">
+    <h2 class="text-2xl font-bold mb-4">Sertifikat Kursus</h2>
+    <div class="mb-2 text-lg font-semibold">{{ course.title }}</div>
+    <div class="mb-2">Nama: <b>{{ certificate.user.get_full_name }}</b></div>
+    <div class="mb-2">Tanggal Terbit: {{ certificate.issue_date|date:"d M Y" }}</div>
+    {% if certificate.certificate_file %}
+        <div class="my-4">
+            <img src="{{ certificate.certificate_file.url }}" alt="Sertifikat" class="mx-auto rounded shadow max-h-96">
+        </div>
+        <a href="{% url 'certificate_download' course.id certificate.id %}" class="bg-cyan-600 text-white px-6 py-2 rounded hover:bg-cyan-700 mt-4 inline-block">
+            <i class="fas fa-download mr-2"></i>Download Sertifikat
+        </a>
+    {% else %}
+        <div class="text-red-600 mt-4">File sertifikat belum tersedia.</div>
+    {% endif %}
+    <div class="mt-6">
+        <a href="{% url 'certificate_list' course.id %}" class="text-cyan-600 hover:underline">← Kembali ke daftar sertifikat</a>
+    </div>
+</div>
+{% endblock %}

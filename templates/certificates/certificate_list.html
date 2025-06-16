@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Sertifikat - {{ course.title }}{% endblock %}
+{% block content %}
+<div class="max-w-2xl mx-auto py-8">
+    <h2 class="text-2xl font-bold mb-4">Sertifikat untuk {{ course.title }}</h2>
+    {% if certificates %}
+        <ul class="space-y-4">
+            {% for certificate in certificates %}
+            <li class="bg-white p-4 rounded shadow flex justify-between items-center">
+                <div>
+                    <div class="font-semibold text-lg">Sertifikat #{{ certificate.id|slice:":8" }}</div>
+                    <div class="text-gray-500 text-sm">Diterbitkan: {{ certificate.issue_date|date:"d M Y" }}</div>
+                </div>
+                <a href="{% url 'certificate_detail' course.id certificate.id %}" class="bg-cyan-600 text-white px-4 py-2 rounded hover:bg-cyan-700">Lihat Sertifikat</a>
+            </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Belum ada sertifikat untuk kursus ini.</p>
+    {% endif %}
+    <a href="{% url 'course_detail' course.id %}" class="mt-6 inline-block text-cyan-600 hover:underline">← Kembali ke detail kursus</a>
+</div>
+{% endblock %}

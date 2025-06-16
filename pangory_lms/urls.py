@@ -26,6 +26,7 @@ from django.contrib.auth.views import LogoutView
 from courses import views as courses_views
 from discussions import views as discussions_views
 from exams import views as exams_views
+from certificates import views as certificates_views
 
 
 urlpatterns = [
@@ -57,11 +58,14 @@ urlpatterns = [
     path('courses/<int:course_id>/exams/session/<int:session_id>/', exams_views.exam_session, name='exam_session'),
     path('courses/<int:course_id>/exams/session/<int:session_id>/submit/', exams_views.submit_answer, name='submit_answer'),
 
+    # sertifikat
+    path('courses/<int:course_id>/certificates/', certificates_views.certificate_list, name='certificate_list'),
+    path('courses/<int:course_id>/certificates/<uuid:certificate_id>/', certificates_views.certificate_detail, name='certificate_detail'),
+    path('courses/<int:course_id>/certificates/<uuid:certificate_id>/download/', certificates_views.certificate_download, name='certificate_download'),
+
     path('dashboard/', views.student_dashboard, name='student_dashboard'),
-    # path('admin/courses/', courses_views.admin_course_list, name='admin_course_list'),
-    # path('admin/courses/add/', courses_views.admin_course_add, name='admin_course_add'),
-    # path('admin/courses/<int:course_id>/edit/', courses_views.admin_course_edit, name='admin_course_edit'),
-    # path('admin/courses/<int:course_id>/delete/', courses_views.admin_course_delete, name='admin_course_delete'),
+
+    # untuk pengajar
     # path('instructor/courses/', courses_views.instructor_course_list, name='instructor_course_list'),
     # path('instructor/courses/add/', courses_views.instructor_course_add, name='instructor_course_add'),
     # path('instructor/courses/<int:course_id>/edit/', courses_views.instructor_course_edit, name='instructor_course_edit'),

@@ -123,13 +123,15 @@
             </div>
         </div>
 
-        <div class="mt-8 mb-8">
-            <a href="{% url 'course_discussion' course.id %}" class="inline-block px-4 py-2 bg-cyan-600 text-white rounded hover:bg-cyan-700">
-                <i class="fas fa-comments mr-2"></i> Diskusi Kursus
+        <div class="flex flex-col sm:flex-row sm:items-center sm:space-x-4 mt-8 mb-8 space-y-3 sm:space-y-0">
+            <a href="{% url 'course_discussion' course.id %}" class="inline-flex items-center px-4 py-2 bg-cyan-600 text-white rounded hover:bg-cyan-700 transition">
+            <i class="fas fa-comments mr-2"></i> Diskusi Kursus
             </a>
-
-            <a href="{% url 'exam_list' course.id %}" class="inline-block px-4 py-2 bg-cyan-500 text-white rounded hover:bg-cyan-700 mt-4">
-                <i class="fas fa-file-alt mr-2"></i> Lihat Ujian
+            <a href="{% url 'exam_list' course.id %}" class="inline-flex items-center px-4 py-2 bg-cyan-500 text-white rounded hover:bg-cyan-700 transition">
+            <i class="fas fa-file-alt mr-2"></i> Lihat Ujian
+            </a>
+            <a href="{% url 'certificate_list' course.id %}" class="inline-flex items-center px-4 py-2 bg-white text-cyan-600 rounded border border-cyan-200 hover:underline hover:bg-cyan-50 transition">
+            <i class="fas fa-certificate mr-2"></i> Lihat Sertifikat Saya
             </a>
         </div>
 
