@@ -47,10 +47,35 @@
                     <a href="/contact/" class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-cyan-600 transition">Kontak</a>
                 </div>
                 
+                {% if user.is_authenticated %}
+                <!-- User Profile Dropdown (Desktop) -->
+                <div class="hidden md:flex items-center space-x-4">
+                    <div class="relative" id="profile-menu-container">
+                        <button id="user-menu-button" class="flex items-center space-x-2 focus:outline-none">
+                            <img class="h-8 w-8 rounded-full" src="{% if user.profile.avatar %}{{ user.profile.avatar.url }}{% else %}https://randomuser.me/api/portraits/men/32.jpg{% endif %}" alt="User profile">
+                            <span class="text-sm font-medium text-gray-700">{{ user.first_name }} {{ user.last_name }}</span>
+                            <i class="fas fa-chevron-down text-xs ml-1"></i>
+                        </button>
+                        <!-- Dropdown menu -->
+                        <div id="profile-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-20 border border-gray-100">
+                            <a href="{% url 'user_profile' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                                <i class="fas fa-user mr-2"></i> Profil Saya
+                            </a>
+                            <form method="post" action="{% url 'logout' %}">
+                                {% csrf_token %}
+                                <button type="submit" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                                    <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                {% else %}
                 <div class="hidden md:flex items-center space-x-2">
                     <a href="/login" class="px-4 py-2 rounded-md text-sm font-medium text-cyan-600 border border-cyan-600 hover:bg-cyan-50 transition">Login</a>
                     <a href="/register" class="px-4 py-2 rounded-md text-sm font-medium text-white bg-cyan-600 hover:bg-cyan-700 transition">Register</a>
                 </div>
+                {% endif %}
                 
                 <!-- Mobile menu button -->
                 <div class="md:hidden flex items-center">
@@ -69,8 +94,25 @@
                 <a href="/about/" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-cyan-600 hover:bg-gray-50">Tentang</a>
                 <a href="/contact/" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-cyan-600 hover:bg-gray-50">Kontak</a>
                 <div class="pt-4 border-t border-gray-200">
-                    <a href="/login" class="block w-full px-4 py-2 text-center rounded-md text-base font-medium text-cyan-600 border border-cyan-600 hover:bg-cyan-50 mb-2">Login</a>
-                    <a href="/register" class="block w-full px-4 py-2 text-center rounded-md text-base font-medium text-white bg-cyan-600 hover:bg-cyan-700">Register</a>
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'user_profile' %}" class="block w-full px-4 py-2 text-center rounded-md text-base font-medium text-gray-700 hover:text-cyan-600 hover:bg-gray-50 mb-2">
+                            <div class="flex items-center justify-center">
+                                <img class="h-6 w-6 rounded-full mr-2" src="{% if user.profile.avatar %}{{ user.profile.avatar.url }}{% else %}https://randomuser.me/api/portraits/men/32.jpg{% endif %}" alt="User profile">
+                                Profil Saya
+                            </div>
+                        </a>
+                        <form method="post" action="{% url 'logout' %}">
+                            {% csrf_token %}
+                            <button type="submit" class="block w-full px-4 py-2 text-center rounded-md text-base font-medium text-gray-700 hover:text-cyan-600 hover:bg-gray-50">
+                                <div class="flex items-center justify-center">
+                                    <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                                </div>
+                            </button>
+                        </form>
+                    {% else %}
+                        <a href="/login" class="block w-full px-4 py-2 text-center rounded-md text-base font-medium text-cyan-600 border border-cyan-600 hover:bg-cyan-50 mb-2">Login</a>
+                        <a href="/register" class="block w-full px-4 py-2 text-center rounded-md text-base font-medium text-white bg-cyan-600 hover:bg-cyan-700">Register</a>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -388,6 +430,21 @@
         mobileMenuButton.addEventListener('click', function() {
             mobileMenu.classList.toggle('active');
         });
+
+        // Dropdown profile menu (desktop)
+        const userMenuButton = document.getElementById('user-menu-button');
+        const profileDropdown = document.getElementById('profile-dropdown');
+        const profileMenuContainer = document.getElementById('profile-menu-container');
+        userMenuButton.addEventListener('click', function(e) {
+            e.stopPropagation();
+            profileDropdown.classList.toggle('hidden');
+        });
+        document.addEventListener('click', function(e) {
+            if (!profileMenuContainer.contains(e.target)) {
+                profileDropdown.classList.add('hidden');
+            }
+        });
+
     </script>
 </body>
 </html>

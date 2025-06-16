@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Peserta Kursus - {{ course.title }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+    <div class="max-w-3xl mx-auto py-8">
+        <h1 class="text-2xl font-bold mb-4">Peserta Kursus: {{ course.title }}</h1>
+        <ul class="bg-white rounded shadow p-6">
+            {% for student in students %}
+                <li class="border-b py-2">
+                    {{ student.get_full_name }} ({{ student.email }})
+                </li>
+            {% empty %}
+                <li class="text-gray-500">Belum ada peserta yang mendaftar.</li>
+            {% endfor %}
+        </ul>
+        <a href="{% url 'course_detail' course.id %}" class="inline-block mt-6 text-cyan-600 hover:underline">Kembali ke detail kursus</a>
+    </div>
+</body>
+</html>

@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="max-w-2xl mx-auto py-8">
+    <h2 class="text-2xl font-bold mb-4">Diskusi: {{ course.title }}</h2>
+    <a href="{% url 'create_discussion_post' course.id %}" class="mb-4 inline-block px-4 py-2 bg-cyan-600 text-white rounded hover:bg-cyan-700">
+        <i class="fas fa-plus"></i> Buat Diskusi Baru
+    </a>
+    <div class="space-y-4">
+        {% for post in posts %}
+            <div class="bg-white p-4 rounded shadow">
+                <a href="{% url 'discussion_post_detail' course.id post.id %}" class="text-lg font-semibold text-cyan-700 hover:underline">{{ post.topic }}</a>
+                <div class="text-gray-600 text-sm mb-2">oleh {{ post.author.get_full_name }} | {{ post.created_at|date:"d M Y H:i" }}</div>
+                <div class="text-gray-800">{{ post.content|truncatewords:30 }}</div>
+                <div class="text-xs text-gray-500 mt-2">{{ post.reply_count }} balasan</div>
+            </div>
+        {% empty %}
+            <p class="text-gray-500">Belum ada diskusi.</p>
+        {% endfor %}
+    </div>
+    <a href="{% url 'course_detail' course.id %}" class="mt-6 inline-block text-cyan-600 hover:underline">← Kembali ke detail kursus</a>
+</div>
+{% endblock %}

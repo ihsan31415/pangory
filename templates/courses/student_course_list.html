@@ -11,21 +11,22 @@
 </head>
 <body class="bg-gray-50">
     <!-- Navigation -->
-    <nav class="bg-white shadow-sm mb-8">
+    <nav class="bg-white shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
                 <div class="flex items-center">
-                    <i class="fas fa-graduation-cap text-2xl text-cyan-600 mr-2"></i>
-                    <span class="text-xl font-bold text-gray-800">CourseApp Student</span>
-                </div>
-                <div class="flex items-center space-x-4">
-                    <a href="{% url 'my_courses' %}" class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-cyan-600">Kursus Saya</a>
-                    <div class="relative">
-                        <button class="flex items-center space-x-1">
-                            <img class="h-8 w-8 rounded-full" src="https://randomuser.me/api/portraits/men/44.jpg" alt="User profile">
-                            <span class="text-sm font-medium">{{ request.user.get_full_name|default:request.user.username }}</span>
-                        </button>
+                    <div class="flex-shrink-0 flex items-center">
+                        <i class="fas fa-graduation-cap text-2xl text-cyan-600 mr-2"></i>
+                        <span class="text-xl font-bold text-gray-800">Pangory</span>
                     </div>
+                </div>
+                
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex items-center space-x-4">
+                    <a href="/" class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-cyan-600 transition">Beranda</a>
+                    <a href="/courses/" class="px-3 py-2 rounded-md text-sm font-medium text-cyan-600">Kursus</a>
+                    <a href="/about" class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-cyan-600 transition">Tentang</a>
+                    <a href="/contact" class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-cyan-600 transition">Kontak</a>
                 </div>
             </div>
         </div>
@@ -37,48 +38,11 @@
             <h2 class="text-3xl font-bold text-gray-900 mb-2">Daftar Kursus Tersedia</h2>
             <p class="text-lg text-gray-600 mb-6">Pilih kursus yang ingin kamu ikuti dan mulai belajar!</p>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {% for course in available_courses %}
-              <div class="bg-white rounded-lg shadow-md overflow-hidden transition duration-300 hover:-translate-y-1 hover:shadow-lg">
-                  <div class="h-40 bg-cyan-500 flex items-center justify-center relative">
-                      <i class="fas fa-book-open text-white text-5xl"></i>
-                      <span class="absolute top-2 right-2 bg-yellow-400 text-xs font-bold px-2 py-1 rounded-full">NEW</span>
-                  </div>
-                  <div class="p-6">
-                      <a href="{% url 'course_detail' course.id %}" class="text-xl font-bold text-gray-900 mb-2 hover:text-cyan-700 block">
-                          {{ course.title }}
-                      </a>
-                      <p class="text-gray-600 mb-4">{{ course.description|truncatewords:20 }}</p>
-                      <div class="flex items-center mb-4">
-                          <i class="fas fa-chalkboard-teacher text-cyan-600 mr-2"></i>
-                          <span class="text-sm text-gray-700">{{ course.instructor.get_full_name }}</span>
-                      </div>
-                      <div class="flex justify-between items-center">
-                          <span class="text-sm font-semibold text-green-600">{{ course.status }}</span>
-                          <!-- Form hanya membungkus tombol Daftar -->
-                          <form method="post" action="{% url 'enroll_course' course.id %}">
-                              {% csrf_token %}
-                              <button type="submit" class="px-4 py-2 bg-cyan-600 text-white rounded-md hover:bg-cyan-700 transition">Daftar</button>
-                          </form>
-                      </div>
-                  </div>
-              </div>
-              {% empty %}
-              <div class="col-span-3 text-center text-gray-500 py-8">
-                  Tidak ada kursus baru yang tersedia.
-              </div>
-              {% endfor %}
-          </div>
-        </div>
-
-        <!-- My Courses -->
-        <div>
-            <h2 class="text-2xl font-bold text-gray-900 mb-4">Kursus Saya</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {% for course in my_courses %}
+                {% for course in available_courses %}
                 <div class="bg-white rounded-lg shadow-md overflow-hidden transition duration-300 hover:-translate-y-1 hover:shadow-lg">
-                    <div class="h-40 bg-green-500 flex items-center justify-center relative">
-                        <i class="fas fa-check-circle text-white text-5xl"></i>
-                        <span class="absolute top-2 right-2 bg-green-400 text-xs font-bold px-2 py-1 rounded-full">ENROLLED</span>
+                    <div class="h-40 bg-cyan-500 flex items-center justify-center relative">
+                        <i class="fas fa-book-open text-white text-5xl"></i>
+                        <span class="absolute top-2 right-2 bg-yellow-400 text-xs font-bold px-2 py-1 rounded-full">NEW</span>
                     </div>
                     <div class="p-6">
                         <a href="{% url 'course_detail' course.id %}" class="text-xl font-bold text-gray-900 mb-2 hover:text-cyan-700 block">
@@ -89,17 +53,30 @@
                             <i class="fas fa-chalkboard-teacher text-cyan-600 mr-2"></i>
                             <span class="text-sm text-gray-700">{{ course.instructor.get_full_name }}</span>
                         </div>
-                        <a href="{% url 'course_detail' course.id %}" class="inline-block px-4 py-2 bg-cyan-600 text-white rounded-md hover:bg-cyan-700 transition">Lihat Kursus</a>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm font-semibold text-green-600">{{ course.status }}</span>
+                            {% if user.is_authenticated %}
+                                {% if not course.is_enrolled %}
+                                <form method="post" action="{% url 'enroll_course' course.id %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="px-4 py-2 bg-cyan-600 text-white rounded-md hover:bg-cyan-700 transition">Daftar</button>
+                                </form>
+                                {% else %}
+                                <span class="text-green-600 font-semibold">Sudah Terdaftar</span>
+                                {% endif %}
+                            {% else %}
+                                <a href="{% url 'login' %}?next={% url 'enroll_course' course.id %}" class="px-4 py-2 bg-cyan-600 text-white rounded-md hover:bg-cyan-700 transition">Daftar</a>
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
                 {% empty %}
                 <div class="col-span-3 text-center text-gray-500 py-8">
-                    Kamu belum mendaftar kursus apapun.
+                    Tidak ada kursus baru yang tersedia.
                 </div>
                 {% endfor %}
             </div>
         </div>
-        <!-- ...existing code... -->
     </div>
 </body>
 </html>

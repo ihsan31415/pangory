@@ -1,21 +1,25 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from .models import Course, Enrollment
+from .models import Course, Enrollment, Module, Task, TaskSubmission
 from django.contrib.admin.views.decorators import staff_member_required
 from .forms import CourseForm 
+from django.http import HttpResponseForbidden
 
-@login_required
 def student_course_list(request):
-    # Semua course yang published
     all_courses = Course.objects.filter(status='PUBLISHED')
-    # Course yang sudah di-enroll user
-    enrolled_ids = Enrollment.objects.filter(student=request.user).values_list('course_id', flat=True)
-    my_courses = all_courses.filter(id__in=enrolled_ids)
-    available_courses = all_courses.exclude(id__in=enrolled_ids)
-    for course in available_courses:
-        course.is_enrolled = False
-    for course in my_courses:
-        course.is_enrolled = True
+    if request.user.is_authenticated:
+        enrolled_ids = Enrollment.objects.filter(student=request.user).values_list('course_id', flat=True)
+        my_courses = all_courses.filter(id__in=enrolled_ids)
+        available_courses = all_courses.exclude(id__in=enrolled_ids)
+        for course in available_courses:
+            course.is_enrolled = False
+        for course in my_courses:
+            course.is_enrolled = True
+    else:
+        available_courses = all_courses
+        my_courses = []
+        for course in available_courses:
+            course.is_enrolled = False
     return render(request, 'courses/student_course_list.html', {
         'available_courses': available_courses,
         'my_courses': my_courses,
@@ -23,27 +27,73 @@ def student_course_list(request):
 
 @login_required
 def enroll_course(request, course_id):
-    course = get_object_or_404(Course, id=course_id, status='published')
-    Enrollment.objects.get_or_create(user=request.user, course=course)
+    course = get_object_or_404(Course, id=course_id, status='PUBLISHED')  # perbaiki status
+    Enrollment.objects.get_or_create(student=request.user, course=course)
     return redirect('my_courses')
 
 @login_required
 def my_courses(request):
-    enrollments = Enrollment.objects.filter(user=request.user).select_related('course')
-    return render(request, 'courses/my_courses.html', {'enrollments': enrollments})
+    # Ambil semua course yang sudah di-enroll user
+    enrolled_ids = Enrollment.objects.filter(student=request.user).values_list('course_id', flat=True)
+    my_courses = Course.objects.filter(id__in=enrolled_ids, status='PUBLISHED')
+    for course in my_courses:
+        course.is_enrolled = True
+    return render(request, 'courses/my_courses.html', {'my_courses': my_courses})
 
 @login_required
 def course_detail(request, course_id):
-    course = get_object_or_404(Course, id=course_id)
-    # Pastikan user sudah enroll
-    if not Enrollment.objects.filter(student=request.user, course=course).exists():
-        return redirect('student_course_list')
-    modules = course.modules.all().order_by('order')
+    course = get_object_or_404(Course, pk=course_id)
+    modules = course.modules.all()
     tasks = course.tasks.all()
+    student_count = course.students.count()
+    module_count = modules.count()
     return render(request, 'courses/course_detail.html', {
         'course': course,
         'modules': modules,
         'tasks': tasks,
+        'student_count': student_count,
+        'module_count': module_count,
+    })
+
+@login_required
+def course_enrolled_students(request, course_id):
+    course = get_object_or_404(Course, id=course_id)
+    enrollments = course.enrollments.select_related('student')
+    students = [enrollment.student for enrollment in enrollments]
+    return render(request, 'courses/course_enrolled_students.html', {
+        'course': course,
+        'students': students,
+    })
+
+@login_required
+def task_detail(request, course_id, task_id):
+    course = get_object_or_404(Course, id=course_id)
+    task = get_object_or_404(Task, id=task_id, course=course)
+    # Cek apakah user sudah enroll
+    if not Enrollment.objects.filter(student=request.user, course=course).exists():
+        return HttpResponseForbidden("Anda belum terdaftar di kursus ini.")
+    # Cek submission
+    submission = TaskSubmission.objects.filter(task=task, student=request.user).first()
+    if request.method == 'POST':
+        answer_text = request.POST.get('answer_text', '')
+        answer_file = request.FILES.get('answer_file')
+        if submission:
+            submission.answer_text = answer_text
+            if answer_file:
+                submission.answer_file = answer_file
+            submission.save()
+        else:
+            submission = TaskSubmission.objects.create(
+                task=task,
+                student=request.user,
+                answer_text=answer_text,
+                answer_file=answer_file
+            )
+        return redirect('task_detail', course_id=course.id, task_id=task.id)
+    return render(request, 'courses/task_detail.html', {
+        'course': course,
+        'task': task,
+        'submission': submission,
     })
 
 @staff_member_required
