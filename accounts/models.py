@@ -53,3 +53,28 @@ class UserProfile(models.Model):
     
     def __str__(self):
         return f"Profile for {self.user.email}"
+
+class Notification(models.Model):
+    """
+    Model for user notifications
+    """
+    NOTIFICATION_TYPES = [
+        ('COURSE', 'Course Update'),
+        ('ASSIGNMENT', 'New Assignment'),
+        ('GRADE', 'Grade Update'),
+        ('SYSTEM', 'System Notification'),
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications')
+    title = models.CharField(max_length=255)
+    message = models.TextField()
+    notification_type = models.CharField(max_length=20, choices=NOTIFICATION_TYPES)
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    link = models.CharField(max_length=255, blank=True, null=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.title} - {self.user.email}"

@@ -27,6 +27,7 @@ from courses import views as courses_views
 from discussions import views as discussions_views
 from exams import views as exams_views
 from certificates import views as certificates_views
+from django.contrib.auth import views as auth_views
 
 
 urlpatterns = [
@@ -70,6 +71,13 @@ urlpatterns = [
     # path('instructor/courses/add/', courses_views.instructor_course_add, name='instructor_course_add'),
     # path('instructor/courses/<int:course_id>/edit/', courses_views.instructor_course_edit, name='instructor_course_edit'),
     # path('instructor/courses/<int:course_id>/delete/', courses_views.instructor_course_delete, name='instructor_course_delete'),
+
+    path('courses/<int:course_id>/player/<int:material_id>/', courses_views.course_player, name='course_player'),
+
+    path('password_reset/', auth_views.PasswordResetView.as_view(template_name='auth/password_reset.html'), name='password_reset'),
+    path('password_reset/done/', auth_views.PasswordResetDoneView.as_view(template_name='auth/password_reset_done.html'), name='password_reset_done'),
+    path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(template_name='auth/password_reset_confirm.html'), name='password_reset_confirm'),
+    path('reset/done/', auth_views.PasswordResetCompleteView.as_view(template_name='auth/password_reset_complete.html'), name='password_reset_complete'),
 ]
 
 # Serve media files in development

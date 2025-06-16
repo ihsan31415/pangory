@@ -3,6 +3,7 @@ from graphene_django import DjangoObjectType
 from graphql_jwt.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.db import models
+from graphene_file_upload.scalars import Upload
 
 from .models import Course, Module, Material, MaterialType, Task, TaskSubmission, Enrollment, CourseStatus
 from accounts.models import User, UserRole
@@ -283,9 +284,10 @@ class UpdateCourse(graphene.Mutation):
         description = graphene.String()
         price = graphene.Decimal()
         status = CourseStatusEnum()
+        thumbnail = Upload()
     
     @login_required
-    def mutate(self, info, id, title=None, description=None, price=None, status=None):
+    def mutate(self, info, id, title=None, description=None, price=None, status=None, thumbnail=None):
         user = info.context.user
         
         try:
@@ -308,6 +310,9 @@ class UpdateCourse(graphene.Mutation):
         
         if status is not None:
             course.status = status
+        
+        if thumbnail is not None:
+            course.thumbnail = thumbnail
         
         course.save()
         

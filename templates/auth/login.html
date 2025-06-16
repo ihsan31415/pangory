@@ -57,10 +57,7 @@
             
             <!-- Password -->
             <div>
-                <div class="flex items-center justify-between mb-1">
-                    <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
-                    <a href="forgot-password.html" class="text-xs text-cyan-600 hover:text-cyan-700 font-medium">Lupa password?</a>
-                </div>
+                <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
                 <div class="relative">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <i class="fas fa-lock text-gray-400"></i>
@@ -71,30 +68,16 @@
                         name="password"
                         required
                         class="pl-10 w-full py-3 rounded-lg border-gray-300 focus:border-cyan-500 focus:ring-cyan-500 shadow-sm input-focus transition"
-                        placeholder="••••••••">
+                        placeholder="Password">
                 </div>
             </div>
             
-            <!-- Remember Me -->
-            <div class="flex items-center justify-between">
-                <div class="flex items-center">
-                    <input 
-                        id="remember" 
-                        name="remember" 
-                        type="checkbox" 
-                        class="h-4 w-4 text-cyan-600 focus:ring-cyan-500 border-gray-300 rounded">
-                    <label for="remember" class="ml-2 block text-sm text-gray-700">
-                        Ingat saya
-                    </label>
-                </div>
-            </div>
-            
-            <!-- Submit Button -->
-            <button
-                type="submit"
-                class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 transition">
-                <i class="fas fa-sign-in-alt mr-2"></i> Masuk
+            <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500">
+                Login
             </button>
+            <div class="flex justify-end mt-2">
+                <a href="{% url 'password_reset' %}" class="text-sm text-cyan-600 hover:text-cyan-700 font-medium">Lupa password?</a>
+            </div>
         </form>
         
         <!-- Social Login -->

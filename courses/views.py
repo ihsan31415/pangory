@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from .models import Course, Enrollment, Module, Task, TaskSubmission
+from .models import Course, Enrollment, Module, Task, TaskSubmission, Material
 from django.contrib.admin.views.decorators import staff_member_required
 from .forms import CourseForm 
 from django.http import HttpResponseForbidden
@@ -172,3 +172,25 @@ def instructor_course_delete(request, course_id):
         course.delete()
         return redirect('instructor_course_list')
     return render(request, 'courses/instructor_course_confirm_delete.html', {'course': course})
+
+@login_required
+def course_player(request, course_id, material_id):
+    course = get_object_or_404(Course, pk=course_id)
+    material = get_object_or_404(Material, pk=material_id)
+    module = material.module
+    # Only allow enrolled students or instructor
+    if not (course.students.filter(id=request.user.id).exists() or course.instructor.id == request.user.id or request.user.is_staff or request.user.is_superuser):
+        return HttpResponseForbidden("Anda tidak terdaftar di kursus ini.")
+    # Get all materials in this module, ordered
+    materials = list(module.materials.all())
+    # Find current, previous, and next material
+    current_idx = next((i for i, m in enumerate(materials) if m.id == material.id), None)
+    prev_material = materials[current_idx - 1] if current_idx is not None and current_idx > 0 else None
+    next_material = materials[current_idx + 1] if current_idx is not None and current_idx < len(materials) - 1 else None
+    return render(request, 'courses/player.html', {
+        'course': course,
+        'material': material,
+        'materials': materials,
+        'prev_material': prev_material,
+        'next_material': next_material,
+    })

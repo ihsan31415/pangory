@@ -42,11 +42,7 @@
                                 <li class="mb-1">
                                     <span class="font-medium">{{ material.title }}</span>
                                     <span class="text-xs text-gray-500 ml-2">({{ material.get_type_display }})</span>
-                                    {% if material.url %}
-                                        <a href="{{ material.url }}" class="text-cyan-600 hover:underline ml-2" target="_blank">Lihat</a>
-                                    {% elif material.file %}
-                                        <a href="{{ material.file.url }}" class="text-cyan-600 hover:underline ml-2" target="_blank">Download</a>
-                                    {% endif %}
+                                    <a href="{% url 'course_player' course.id material.id %}" class="text-cyan-600 hover:underline ml-2" target="_blank">Lihat</a>
                                 </li>
                             {% endfor %}
                         </ul>

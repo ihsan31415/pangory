@@ -90,14 +90,33 @@
                 </div>
                 
                 <div class="hidden md:flex items-center space-x-4">
-                    <div class="relative">
-                        <button class="flex items-center space-x-2 focus:outline-none" id="notif-btn">
-                            <div class="h-8 w-8 rounded-full bg-cyan-100 flex items-center justify-center">
+                    <!-- Notification Dropdown -->
+                    <div class="relative" id="notification-dropdown-container">
+                        <button id="notification-button" class="flex items-center space-x-2 focus:outline-none">
+                            <div class="h-8 w-8 rounded-full bg-cyan-100 flex items-center justify-center relative">
                                 <i class="fas fa-bell text-cyan-600"></i>
+                                <span id="notification-badge" class="hidden absolute -top-1 -right-1 h-4 w-4 rounded-full bg-red-500 text-white text-xs flex items-center justify-center">0</span>
                             </div>
                         </button>
-                        <span class="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-white"></span>
+                        
+                        <!-- Notification Dropdown -->
+                        <div id="notification-dropdown" class="hidden absolute right-0 mt-2 w-80 bg-white rounded-md shadow-lg py-1 z-20 border border-gray-100">
+                            <div class="px-4 py-2 border-b border-gray-100">
+                                <div class="flex justify-between items-center">
+                                    <h3 class="text-sm font-medium text-gray-900">Notifikasi</h3>
+                                    <button id="mark-all-read" class="text-xs text-cyan-600 hover:text-cyan-700">Tandai semua dibaca</button>
+                                </div>
+                            </div>
+                            <div id="notification-list" class="max-h-96 overflow-y-auto">
+                                <!-- Notifications will be loaded here -->
+                            </div>
+                            <div id="no-notifications" class="hidden px-4 py-3 text-center text-sm text-gray-500">
+                                Tidak ada notifikasi
+                            </div>
+                        </div>
                     </div>
+
+                    <!-- User Profile Dropdown -->
                     <div class="relative" id="profile-menu-container">
                         <button id="user-menu-button" class="flex items-center space-x-2 focus:outline-none">
                             <img class="h-8 w-8 rounded-full" src="{% if user.profile.avatar %}{{ user.profile.avatar.url }}{% else %}https://randomuser.me/api/portraits/men/32.jpg{% endif %}" alt="User profile">
@@ -407,6 +426,224 @@
                     alert('Terjadi kesalahan saat memperbarui profil');
                 }
             });
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const notificationButton = document.getElementById('notification-button');
+            const notificationDropdown = document.getElementById('notification-dropdown');
+            const notificationList = document.getElementById('notification-list');
+            const noNotifications = document.getElementById('no-notifications');
+            const notificationBadge = document.getElementById('notification-badge');
+            const markAllReadButton = document.getElementById('mark-all-read');
+            
+            // Toggle dropdown
+            notificationButton.addEventListener('click', function(e) {
+                e.stopPropagation();
+                notificationDropdown.classList.toggle('hidden');
+                if (!notificationDropdown.classList.contains('hidden')) {
+                    loadNotifications();
+                }
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!notificationDropdown.contains(e.target) && !notificationButton.contains(e.target)) {
+                    notificationDropdown.classList.add('hidden');
+                }
+            });
+            
+            // Load notifications
+            async function loadNotifications() {
+                try {
+                    const response = await fetch('/graphql/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': getCookie('csrftoken')
+                        },
+                        body: JSON.stringify({
+                            query: `
+                                query {
+                                    notifications(unreadOnly: true) {
+                                        id
+                                        title
+                                        message
+                                        notificationType
+                                        isRead
+                                        createdAt
+                                        link
+                                    }
+                                }
+                            `
+                        }),
+                        credentials: 'include'
+                    });
+                    
+                    const result = await response.json();
+                    const notifications = result.data.notifications;
+                    
+                    // Update notification badge
+                    const unreadCount = notifications.filter(n => !n.isRead).length;
+                    if (unreadCount > 0) {
+                        notificationBadge.textContent = unreadCount;
+                        notificationBadge.classList.remove('hidden');
+                    } else {
+                        notificationBadge.classList.add('hidden');
+                    }
+                    
+                    // Update notification list
+                    if (notifications.length === 0) {
+                        notificationList.innerHTML = '';
+                        noNotifications.classList.remove('hidden');
+                    } else {
+                        noNotifications.classList.add('hidden');
+                        notificationList.innerHTML = notifications.map(notification => `
+                            <div class="px-4 py-3 hover:bg-gray-50 ${notification.isRead ? '' : 'bg-cyan-50'}" data-id="${notification.id}">
+                                <div class="flex items-start">
+                                    <div class="flex-shrink-0">
+                                        <i class="fas ${getNotificationIcon(notification.notificationType)} text-cyan-600"></i>
+                                    </div>
+                                    <div class="ml-3 w-0 flex-1">
+                                        <p class="text-sm font-medium text-gray-900">${notification.title}</p>
+                                        <p class="text-sm text-gray-500">${notification.message}</p>
+                                        <p class="text-xs text-gray-400 mt-1">${formatDate(notification.createdAt)}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('');
+                        
+                        // Add click handlers for notifications
+                        notificationList.querySelectorAll('[data-id]').forEach(element => {
+                            element.addEventListener('click', function() {
+                                const notificationId = this.dataset.id;
+                                markNotificationAsRead(notificationId);
+                                if (notifications.find(n => n.id === notificationId)?.link) {
+                                    window.location.href = notifications.find(n => n.id === notificationId).link;
+                                }
+                            });
+                        });
+                    }
+                } catch (error) {
+                    console.error('Error loading notifications:', error);
+                }
+            }
+            
+            // Mark notification as read
+            async function markNotificationAsRead(notificationId) {
+                try {
+                    await fetch('/graphql/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': getCookie('csrftoken')
+                        },
+                        body: JSON.stringify({
+                            query: `
+                                mutation {
+                                    markNotificationAsRead(notificationId: "${notificationId}") {
+                                        success
+                                    }
+                                }
+                            `
+                        }),
+                        credentials: 'include'
+                    });
+                    
+                    // Reload notifications
+                    loadNotifications();
+                } catch (error) {
+                    console.error('Error marking notification as read:', error);
+                }
+            }
+            
+            // Mark all notifications as read
+            markAllReadButton.addEventListener('click', async function() {
+                try {
+                    await fetch('/graphql/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': getCookie('csrftoken')
+                        },
+                        body: JSON.stringify({
+                            query: `
+                                mutation {
+                                    markAllNotificationsAsRead {
+                                        success
+                                    }
+                                }
+                            `
+                        }),
+                        credentials: 'include'
+                    });
+                    
+                    // Reload notifications
+                    loadNotifications();
+                } catch (error) {
+                    console.error('Error marking all notifications as read:', error);
+                }
+            });
+            
+            // Helper functions
+            function getNotificationIcon(type) {
+                const icons = {
+                    'COURSE': 'fa-book',
+                    'ASSIGNMENT': 'fa-tasks',
+                    'GRADE': 'fa-star',
+                    'SYSTEM': 'fa-info-circle'
+                };
+                return icons[type] || 'fa-bell';
+            }
+            
+            function formatDate(dateString) {
+                const date = new Date(dateString);
+                const now = new Date();
+                const diff = now - date;
+                
+                // Less than 24 hours
+                if (diff < 24 * 60 * 60 * 1000) {
+                    const hours = Math.floor(diff / (60 * 60 * 1000));
+                    if (hours === 0) {
+                        const minutes = Math.floor(diff / (60 * 1000));
+                        return `${minutes} menit yang lalu`;
+                    }
+                    return `${hours} jam yang lalu`;
+                }
+                
+                // Less than 7 days
+                if (diff < 7 * 24 * 60 * 60 * 1000) {
+                    const days = Math.floor(diff / (24 * 60 * 60 * 1000));
+                    return `${days} hari yang lalu`;
+                }
+                
+                // Otherwise show full date
+                return date.toLocaleDateString('id-ID', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+            }
+            
+            function getCookie(name) {
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    const cookies = document.cookie.split(';');
+                    for (let i = 0; i < cookies.length; i++) {
+                        const cookie = cookies[i].trim();
+                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+            
+            // Load notifications on page load
+            loadNotifications();
+            
+            // Refresh notifications every minute
+            setInterval(loadNotifications, 60000);
         });
     </script>
 </body>

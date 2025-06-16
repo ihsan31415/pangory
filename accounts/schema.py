@@ -4,8 +4,9 @@ from django.contrib.auth import get_user_model
 from graphql_jwt.decorators import login_required
 import graphql_jwt
 from graphene_file_upload.scalars import Upload
+from datetime import datetime
 
-from .models import User, UserProfile, UserRole
+from .models import User, UserProfile, UserRole, Notification
 
 class UserType(DjangoObjectType):
     class Meta:
@@ -26,6 +27,11 @@ class UserProfileType(DjangoObjectType):
         model = UserProfile
         fields = '__all__'
 
+class NotificationType(DjangoObjectType):
+    class Meta:
+        model = Notification
+        fields = '__all__'
+
 class UserRoleEnum(graphene.Enum):
     STUDENT = UserRole.STUDENT
     INSTRUCTOR = UserRole.INSTRUCTOR
@@ -40,6 +46,10 @@ class Query(graphene.ObjectType):
         search=graphene.String(),
         skip=graphene.Int(),
         limit=graphene.Int()
+    )
+    notifications = graphene.List(
+        NotificationType,
+        unread_only=graphene.Boolean(default_value=False)
     )
     
     @login_required
@@ -81,6 +91,16 @@ class Query(graphene.ObjectType):
         
         if limit:
             qs = qs[:limit]
+        
+        return qs
+
+    @login_required
+    def resolve_notifications(self, info, unread_only=False):
+        user = info.context.user
+        qs = user.notifications.all()
+        
+        if unread_only:
+            qs = qs.filter(is_read=False)
         
         return qs
 
@@ -150,9 +170,41 @@ class UpdateUserProfile(graphene.Mutation):
         
         return UpdateUserProfile(success=True, profile=profile)
 
+class MarkNotificationAsRead(graphene.Mutation):
+    success = graphene.Boolean()
+    
+    class Arguments:
+        notification_id = graphene.ID(required=True)
+    
+    @login_required
+    def mutate(self, info, notification_id):
+        try:
+            notification = Notification.objects.get(
+                id=notification_id,
+                user=info.context.user
+            )
+            notification.is_read = True
+            notification.save()
+            return MarkNotificationAsRead(success=True)
+        except Notification.DoesNotExist:
+            return MarkNotificationAsRead(success=False)
+
+class MarkAllNotificationsAsRead(graphene.Mutation):
+    success = graphene.Boolean()
+    
+    @login_required
+    def mutate(self, info):
+        try:
+            info.context.user.notifications.filter(is_read=False).update(is_read=True)
+            return MarkAllNotificationsAsRead(success=True)
+        except Exception:
+            return MarkAllNotificationsAsRead(success=False)
+
 class Mutation(graphene.ObjectType):
     register_user = RegisterUser.Field()
     update_profile = UpdateUserProfile.Field()
+    mark_notification_as_read = MarkNotificationAsRead.Field()
+    mark_all_notifications_as_read = MarkAllNotificationsAsRead.Field()
     
     # JWT Authentication
     token_auth = graphql_jwt.ObtainJSONWebToken.Field()
