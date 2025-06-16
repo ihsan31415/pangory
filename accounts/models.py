@@ -42,26 +42,20 @@ class User(AbstractUser):
 
     @property
     def courses_taught_count(self):
-        return self.courses_taught.count() if hasattr(self, 'courses_taught') else 0
+        return self.courses_teaching.count()
 
     @property
     def students_taught_count(self):
         from courses.models import Enrollment
-        if hasattr(self, 'courses_taught'):
-            return Enrollment.objects.filter(course__in=self.courses_taught.all()).values('student').distinct().count()
-        return 0
+        return Enrollment.objects.filter(course__in=self.courses_teaching.all()).values('student').distinct().count()
 
     @property
     def tasks_created_count(self):
-        if hasattr(self, 'courses_taught'):
-            return sum(course.tasks.count() for course in self.courses_taught.all())
-        return 0
+        return sum(course.tasks.count() for course in self.courses_teaching.all())
 
     @property
     def exams_created_count(self):
-        if hasattr(self, 'courses_taught'):
-            return sum(course.exams.count() for course in self.courses_taught.all())
-        return 0
+        return sum(course.exams.count() for course in self.courses_teaching.all())
 
 class UserProfile(models.Model):
     """
