@@ -169,3 +169,8 @@ GRAPHQL_JWT = {
     'JWT_EXPIRATION_DELTA': timedelta(days=7),
     'JWT_REFRESH_EXPIRATION_DELTA': timedelta(days=30),
 }
+
+FILE_UPLOAD_HANDLERS = [
+    'django.core.files.uploadhandler.MemoryFileUploadHandler',
+    'django.core.files.uploadhandler.TemporaryFileUploadHandler',
+]

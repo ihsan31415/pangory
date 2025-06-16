@@ -3,6 +3,7 @@ from graphene_django import DjangoObjectType
 from django.contrib.auth import get_user_model
 from graphql_jwt.decorators import login_required
 import graphql_jwt
+from graphene_file_upload.scalars import Upload
 
 from .models import User, UserProfile, UserRole
 
@@ -123,9 +124,10 @@ class UpdateUserProfile(graphene.Mutation):
         bio = graphene.String()
         phone_number = graphene.String()
         address = graphene.String()
+        avatar = Upload()
     
     @login_required
-    def mutate(self, info, bio=None, phone_number=None, address=None):
+    def mutate(self, info, bio=None, phone_number=None, address=None, avatar=None):
         user = info.context.user
         profile = user.profile
         
@@ -137,6 +139,12 @@ class UpdateUserProfile(graphene.Mutation):
         
         if address is not None:
             profile.address = address
+            
+        if avatar is not None:
+            # Delete old avatar if exists
+            if profile.avatar:
+                profile.avatar.delete()
+            profile.avatar = avatar
         
         profile.save()
         
