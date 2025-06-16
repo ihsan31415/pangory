@@ -33,6 +33,7 @@ urlpatterns = [
     path('login/', accounts_views.login_view, name='login'),
     path('userprofile/', accounts_views.user_profile, name='user_profile'),
     path('', views.index, name='index'),
+    path('about/', views.about, name='about'),
     path('logout/', LogoutView.as_view(next_page='login'), name='logout'),
     path('courses/', courses_views.student_course_list, name='student_course_list'),
     path('courses/enroll/<int:course_id>/', courses_views.enroll_course, name='enroll_course'),
