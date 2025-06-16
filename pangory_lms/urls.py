@@ -34,6 +34,7 @@ urlpatterns = [
     path('userprofile/', accounts_views.user_profile, name='user_profile'),
     path('', views.index, name='index'),
     path('about/', views.about, name='about'),
+    path('contact/', views.contact_view, name='contact'),
     path('logout/', LogoutView.as_view(next_page='login'), name='logout'),
     path('courses/', courses_views.student_course_list, name='student_course_list'),
     path('courses/enroll/<int:course_id>/', courses_views.enroll_course, name='enroll_course'),
@@ -47,6 +48,7 @@ urlpatterns = [
     path('instructor/courses/add/', courses_views.instructor_course_add, name='instructor_course_add'),
     path('instructor/courses/<int:course_id>/edit/', courses_views.instructor_course_edit, name='instructor_course_edit'),
     path('instructor/courses/<int:course_id>/delete/', courses_views.instructor_course_delete, name='instructor_course_delete'),
+    path('dashboard/', views.student_dashboard, name='student_dashboard'),
 ]
 
 # Serve media files in development

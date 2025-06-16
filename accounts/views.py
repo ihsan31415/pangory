@@ -61,10 +61,32 @@ def user_profile(request):
             else:
                 messages.error(request, "Password saat ini salah.")
                 return render(request, 'userprofile.html', {'user': user})
-        user.save()
-        profile.save()
+
+        # Debug Avatar Upload
+        print("FILES:", request.FILES)
+        if 'avatar' in request.FILES:
+            try:
+                avatar_file = request.FILES['avatar']
+                print(f"Avatar received: {avatar_file.name}, size: {avatar_file.size}, content_type: {avatar_file.content_type}")
+                profile.avatar = avatar_file
+                print("Avatar assigned to profile")
+            except Exception as e:
+                print(f"Error saving avatar: {e}")
+        else:
+            print("No avatar file in request.FILES")
+
+        try:
+            user.save()
+            profile.save()
+            print("User and profile saved successfully")
+            if profile.avatar:
+                print(f"Avatar path: {profile.avatar.path}, URL: {profile.avatar.url}")
+        except Exception as e:
+            print(f"Error saving user/profile: {e}")
+            messages.error(request, f"Error saving profile: {e}")
+            return render(request, 'userprofile.html', {'user': user})
 
         messages.success(request, "Profil berhasil diperbarui.")
-
         return redirect('user_profile')
+    
     return render(request, 'userprofile.html', {'user': user})

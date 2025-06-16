@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard Student - Pangory</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        .hero-gradient {
+            background: linear-gradient(135deg, #06b6d4 0%, #ec4899 100%);
+        }
+        .card {
+            transition: box-shadow 0.3s, transform 0.3s;
+        }
+        .card:hover {
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
+            transform: translateY(-4px) scale(1.01);
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 flex items-center">
+                        <i class="fas fa-graduation-cap text-2xl text-cyan-600 mr-2"></i>
+                        <span class="text-xl font-bold text-gray-800">Pangory</span>
+                    </div>
+                </div>
+                <div class="hidden md:flex items-center space-x-4">
+                    <a href="/" class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-cyan-600 transition">Beranda</a>
+                    <a href="/courses/" class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-cyan-600 transition">Kursus</a>
+                    <a href="/about/" class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-cyan-600 transition">Tentang</a>
+                    <a href="/contact/" class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-cyan-600 transition">Kontak</a>
+                    <!-- Notifikasi Bell -->
+                    <div class="relative">
+                        <button id="notifBtn" class="relative focus:outline-none">
+                            <span class="absolute -top-1 -right-1 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-red-500 rounded-full">3</span>
+                            <span class="inline-block h-10 w-10 rounded-full bg-cyan-100 flex items-center justify-center">
+                                <i class="fas fa-bell text-cyan-600 text-xl"></i>
+                            </span>
+                        </button>
+                        <!-- Dropdown Notifikasi -->
+                        <div id="notifDropdown" class="hidden absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg z-50">
+                            <div class="p-4 border-b font-bold text-gray-700">Notifikasi</div>
+                            <ul class="max-h-64 overflow-y-auto">
+                                <!-- Jika belum ada notifikasi -->
+                                <li class="px-4 py-6 text-center text-gray-400 text-base select-none" style="opacity:0.7;">Belum ada notifikasi</li>
+                                <!-- Contoh notifikasi, hapus atau tampilkan jika ada notifikasi -->
+                                <!--
+                                <li class="px-4 py-3 hover:bg-gray-50 border-b flex items-start">
+                                    <span class="inline-block h-8 w-8 rounded-full bg-yellow-100 flex items-center justify-center mr-3"><i class="fas fa-bell text-yellow-500"></i></span>
+                                    <div>
+                                        <div class="font-medium text-gray-900">Kamu telah menyelesaikan kursus "Pengembangan Aplikasi Mobile"!</div>
+                                        <div class="text-gray-500 text-xs">1 jam yang lalu</div>
+                                    </div>
+                                </li>
+                                -->
+                            </ul>
+                            <div class="p-2 text-center">
+                                <a href="#" class="text-cyan-600 hover:underline text-sm">Lihat Semua Notifikasi</a>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- End Notifikasi Bell -->
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <div class="hero-gradient">
+        <div class="max-w-7xl mx-auto py-10 px-4 sm:py-14 sm:px-6 lg:py-20 lg:px-8">
+            <div class="text-center">
+                <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white">
+                    <span class="block">Dashboard Siswa</span>
+                </h1>
+                <p class="mt-4 max-w-lg mx-auto text-lg sm:text-xl text-cyan-100">
+                    Selamat datang di dashboard! Lihat progres belajar, kursus yang diikuti, dan notifikasi terbaru.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overview Cards -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-16 relative z-10">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="card bg-white rounded-lg shadow p-6 flex flex-col items-center">
+                <div class="h-12 w-12 flex items-center justify-center rounded-full bg-cyan-100 mb-3">
+                    <i class="fas fa-book text-cyan-600 text-2xl"></i>
+                </div>
+                <div class="text-2xl font-bold text-gray-800">4</div>
+                <div class="text-gray-500">Kursus Diikuti</div>
+            </div>
+            <div class="card bg-white rounded-lg shadow p-6 flex flex-col items-center">
+                <div class="h-12 w-12 flex items-center justify-center rounded-full bg-pink-100 mb-3">
+                    <i class="fas fa-chart-line text-pink-600 text-2xl"></i>
+                </div>
+                <div class="text-2xl font-bold text-gray-800">75%</div>
+                <div class="text-gray-500">Progress Belajar</div>
+            </div>
+            <div class="card bg-white rounded-lg shadow p-6 flex flex-col items-center">
+                <div class="h-12 w-12 flex items-center justify-center rounded-full bg-purple-100 mb-3">
+                    <i class="fas fa-certificate text-purple-600 text-2xl"></i>
+                </div>
+                <div class="text-2xl font-bold text-gray-800">2</div>
+                <div class="text-gray-500">Sertifikat</div>
+            </div>
+            <div class="card bg-white rounded-lg shadow p-6 flex flex-col items-center">
+                <div class="h-12 w-12 flex items-center justify-center rounded-full bg-yellow-100 mb-3">
+                    <i class="fas fa-bell text-yellow-500 text-2xl"></i>
+                </div>
+                <div class="text-2xl font-bold text-gray-800">3</div>
+                <div class="text-gray-500">Notifikasi</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Kursus yang Diikuti -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
+        <div class="mb-6 flex items-center justify-between">
+            <h2 class="text-2xl font-bold text-gray-800">Kursus Saya</h2>
+            <a href="/courses/" class="text-cyan-600 hover:underline font-medium">Lihat Semua</a>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Contoh kursus, bisa diganti dengan loop data dinamis -->
+            <div class="bg-white rounded-lg shadow p-5 flex flex-col">
+                <div class="h-32 bg-cyan-500 rounded-lg flex items-center justify-center mb-4">
+                    <i class="fas fa-code text-white text-4xl"></i>
+                </div>
+                <h3 class="text-lg font-bold text-gray-900 mb-2">Pemrograman Web Modern</h3>
+                <div class="text-gray-500 text-sm mb-4">Progress: 80%</div>
+                <a href="#" class="mt-auto inline-block px-4 py-2 rounded-md bg-cyan-600 text-white font-medium hover:bg-cyan-700 transition">Lanjutkan Belajar</a>
+            </div>
+            <div class="bg-white rounded-lg shadow p-5 flex flex-col">
+                <div class="h-32 bg-pink-500 rounded-lg flex items-center justify-center mb-4">
+                    <i class="fas fa-chart-line text-white text-4xl"></i>
+                </div>
+                <h3 class="text-lg font-bold text-gray-900 mb-2">Data Science Dasar</h3>
+                <div class="text-gray-500 text-sm mb-4">Progress: 60%</div>
+                <a href="#" class="mt-auto inline-block px-4 py-2 rounded-md bg-cyan-600 text-white font-medium hover:bg-cyan-700 transition">Lanjutkan Belajar</a>
+            </div>
+            <div class="bg-white rounded-lg shadow p-5 flex flex-col">
+                <div class="h-32 bg-purple-500 rounded-lg flex items-center justify-center mb-4">
+                    <i class="fas fa-mobile-alt text-white text-4xl"></i>
+                </div>
+                <h3 class="text-lg font-bold text-gray-900 mb-2">Pengembangan Aplikasi Mobile</h3>
+                <div class="text-gray-500 text-sm mb-4">Progress: 100%</div>
+                <a href="#" class="mt-auto inline-block px-4 py-2 rounded-md bg-cyan-600 text-white font-medium hover:bg-cyan-700 transition">Lihat Sertifikat</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notifikasi -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 mb-16">
+        <div class="mb-6 flex items-center justify-between">
+            <h2 class="text-2xl font-bold text-gray-800">Notifikasi</h2>
+            <a href="#" class="text-cyan-600 hover:underline font-medium">Lihat Semua</a>
+        </div>
+        <div class="space-y-4">
+            <div class="bg-white rounded-lg shadow p-4 flex items-center">
+                <div class="h-10 w-10 flex items-center justify-center rounded-full bg-yellow-100 mr-4">
+                    <i class="fas fa-bell text-yellow-500 text-xl"></i>
+                </div>
+                <div>
+                    <div class="font-medium text-gray-900">Kamu telah menyelesaikan kursus "Pengembangan Aplikasi Mobile"!</div>
+                    <div class="text-gray-500 text-sm">1 jam yang lalu</div>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-4 flex items-center">
+                <div class="h-10 w-10 flex items-center justify-center rounded-full bg-cyan-100 mr-4">
+                    <i class="fas fa-bell text-cyan-600 text-xl"></i>
+                </div>
+                <div>
+                    <div class="font-medium text-gray-900">Sertifikat baru telah diterbitkan untuk kursus "Pengembangan Aplikasi Mobile".</div>
+                    <div class="text-gray-500 text-sm">2 jam yang lalu</div>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-4 flex items-center">
+                <div class="h-10 w-10 flex items-center justify-center rounded-full bg-pink-100 mr-4">
+                    <i class="fas fa-bell text-pink-600 text-xl"></i>
+                </div>
+                <div>
+                    <div class="font-medium text-gray-900">Kursus "Data Science Dasar" telah diperbarui dengan materi baru.</div>
+                    <div class="text-gray-500 text-sm">Kemarin</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-white">
+        <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+            <div class="text-center">
+                <p class="text-base text-gray-500">
+                    &copy; 2024 Pangory. Dibuat dengan ❤️ oleh Tim Universitas Negeri Semarang
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var notifBtn = document.getElementById('notifBtn');
+            var notifDropdown = document.getElementById('notifDropdown');
+            if (notifBtn && notifDropdown) {
+                notifBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    notifDropdown.classList.toggle('hidden');
+                    console.log('Lonceng diklik, dropdown toggle');
+                });
+                document.addEventListener('click', function(e) {
+                    if (!notifDropdown.classList.contains('hidden')) {
+                        notifDropdown.classList.add('hidden');
+                    }
+                });
+            } else {
+                console.log('notifBtn atau notifDropdown tidak ditemukan');
+            }
+        });
+    </script>
+</body>
+</html> 

@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Kontak - Pangory</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        .hero-gradient {
+            background: linear-gradient(135deg, #06b6d4 0%, #ec4899 100%);
+        }
+        .contact-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        .social-icon {
+            transition: all 0.3s ease;
+        }
+        .social-icon:hover {
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 flex items-center">
+                        <i class="fas fa-graduation-cap text-2xl text-cyan-600 mr-2"></i>
+                        <span class="text-xl font-bold text-gray-800">Pangory</span>
+                    </div>
+                </div>
+                
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex items-center space-x-4">
+                    <a href="/" class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-cyan-600 transition">Beranda</a>
+                    <a href="/courses/" class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-cyan-600 transition">Kursus</a>
+                    <a href="/about/" class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-cyan-600 transition">Tentang</a>
+                    <a href="/contact/" class="px-3 py-2 rounded-md text-sm font-medium text-cyan-600">Kontak</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <div class="hero-gradient">
+        <div class="max-w-7xl mx-auto py-12 px-4 sm:py-16 sm:px-6 lg:py-24 lg:px-8">
+            <div class="text-center">
+                <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white">
+                    <span class="block">Hubungi Kami</span>
+                </h1>
+                <p class="mt-4 max-w-lg mx-auto text-lg sm:text-xl text-cyan-100">
+                    Tim kami siap membantu Anda dengan pertanyaan dan kebutuhan Anda
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact Form Section -->
+    <div class="py-12 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Contact Form -->
+                <div class="bg-white rounded-lg shadow-lg p-6">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-6">Kirim Pesan</h2>
+                    <form class="space-y-6">
+                        <div>
+                            <label for="name" class="block text-sm font-medium text-gray-700">Nama</label>
+                            <input type="text" id="name" name="name" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-cyan-500 focus:ring-cyan-500">
+                        </div>
+                        <div>
+                            <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+                            <input type="email" id="email" name="email" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-cyan-500 focus:ring-cyan-500">
+                        </div>
+                        <div>
+                            <label for="message" class="block text-sm font-medium text-gray-700">Pesan</label>
+                            <textarea id="message" name="message" rows="4" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-cyan-500 focus:ring-cyan-500"></textarea>
+                        </div>
+                        <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500">
+                            Kirim Pesan
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Contact Information -->
+                <div class="bg-white rounded-lg shadow-lg p-6">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-6">Informasi Kontak</h2>
+                    <div class="space-y-6">
+                        <!-- Team Member 1 -->
+                        <div class="contact-card bg-gray-50 rounded-lg p-4">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0">
+                                    <div class="h-12 w-12 rounded-full bg-cyan-100 flex items-center justify-center">
+                                        <i class="fas fa-user text-xl text-cyan-600"></i>
+                                    </div>
+                                </div>
+                                <div class="ml-4">
+                                    <h3 class="text-lg font-medium text-gray-900">ITSNA SABILA HIDAYATI</h3>
+                                    <div class="mt-2 flex space-x-4">
+                                        <a href="https://wa.me/62895402077060" class="social-icon text-green-600 hover:text-green-700">
+                                            <i class="fab fa-whatsapp text-xl"></i>
+                                        </a>
+                                        <a href="tel:+62895402077060" class="social-icon text-blue-600 hover:text-blue-700">
+                                            <i class="fas fa-phone text-xl"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Team Member 2 -->
+                        <div class="contact-card bg-gray-50 rounded-lg p-4">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0">
+                                    <div class="h-12 w-12 rounded-full bg-pink-100 flex items-center justify-center">
+                                        <i class="fas fa-user text-xl text-pink-600"></i>
+                                    </div>
+                                </div>
+                                <div class="ml-4">
+                                    <h3 class="text-lg font-medium text-gray-900">M. STEVANZA SYLVESTER</h3>
+                                    <div class="mt-2 flex space-x-4">
+                                        <a href="https://wa.me/6282323729900" class="social-icon text-green-600 hover:text-green-700">
+                                            <i class="fab fa-whatsapp text-xl"></i>
+                                        </a>
+                                        <a href="tel:+6282323729900" class="social-icon text-blue-600 hover:text-blue-700">
+                                            <i class="fas fa-phone text-xl"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Team Member 3 -->
+                        <div class="contact-card bg-gray-50 rounded-lg p-4">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0">
+                                    <div class="h-12 w-12 rounded-full bg-purple-100 flex items-center justify-center">
+                                        <i class="fas fa-user text-xl text-purple-600"></i>
+                                    </div>
+                                </div>
+                                <div class="ml-4">
+                                    <h3 class="text-lg font-medium text-gray-900">AWAN SAPUTRA ROMADHONI</h3>
+                                    <div class="mt-2 flex space-x-4">
+                                        <a href="https://wa.me/6282128678637" class="social-icon text-green-600 hover:text-green-700">
+                                            <i class="fab fa-whatsapp text-xl"></i>
+                                        </a>
+                                        <a href="tel:+6282128678637" class="social-icon text-blue-600 hover:text-blue-700">
+                                            <i class="fas fa-phone text-xl"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Team Member 4 -->
+                        <div class="contact-card bg-gray-50 rounded-lg p-4">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0">
+                                    <div class="h-12 w-12 rounded-full bg-cyan-100 flex items-center justify-center">
+                                        <i class="fas fa-user text-xl text-cyan-600"></i>
+                                    </div>
+                                </div>
+                                <div class="ml-4">
+                                    <h3 class="text-lg font-medium text-gray-900">MUHAMMAD KHOIRUL IHSAN</h3>
+                                    <div class="mt-2 flex space-x-4">
+                                        <a href="https://wa.me/62895421389238" class="social-icon text-green-600 hover:text-green-700">
+                                            <i class="fab fa-whatsapp text-xl"></i>
+                                        </a>
+                                        <a href="tel:+62895421389238" class="social-icon text-blue-600 hover:text-blue-700">
+                                            <i class="fas fa-phone text-xl"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Team Member 5 -->
+                        <div class="contact-card bg-gray-50 rounded-lg p-4">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0">
+                                    <div class="h-12 w-12 rounded-full bg-pink-100 flex items-center justify-center">
+                                        <i class="fas fa-user text-xl text-pink-600"></i>
+                                    </div>
+                                </div>
+                                <div class="ml-4">
+                                    <h3 class="text-lg font-medium text-gray-900">MUHAMMAD FIQI FIRMANSYAH</h3>
+                                    <div class="mt-2 flex space-x-4">
+                                        <a href="https://wa.me/6281290110017" class="social-icon text-green-600 hover:text-green-700">
+                                            <i class="fab fa-whatsapp text-xl"></i>
+                                        </a>
+                                        <a href="tel:+6281290110017" class="social-icon text-blue-600 hover:text-blue-700">
+                                            <i class="fas fa-phone text-xl"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Team Member 6 -->
+                        <div class="contact-card bg-gray-50 rounded-lg p-4">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0">
+                                    <div class="h-12 w-12 rounded-full bg-purple-100 flex items-center justify-center">
+                                        <i class="fas fa-user text-xl text-purple-600"></i>
+                                    </div>
+                                </div>
+                                <div class="ml-4">
+                                    <h3 class="text-lg font-medium text-gray-900">RISKI YUNIAR PRATAMA</h3>
+                                    <div class="mt-2 flex space-x-4">
+                                        <a href="https://wa.me/6285643065955" class="social-icon text-green-600 hover:text-green-700">
+                                            <i class="fab fa-whatsapp text-xl"></i>
+                                        </a>
+                                        <a href="tel:+6285643065955" class="social-icon text-blue-600 hover:text-blue-700">
+                                            <i class="fas fa-phone text-xl"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-white">
+        <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+            <div class="text-center">
+                <p class="text-base text-gray-500">
+                    &copy; 2024 Pangory. Dibuat dengan ❤️ oleh Tim Universitas Negeri Semarang
+                </p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html> 
