@@ -55,6 +55,15 @@ def exam_session(request, course_id, session_id):
     session = get_object_or_404(ExamSession, id=session_id, student=request.user)
     exam = session.exam
     questions = list(exam.questions.all())
+    
+    # Cek apakah ada soal
+    if not questions:
+        return render(request, 'exam/error.html', {
+            'message': 'Ujian ini belum memiliki soal. Silakan hubungi instruktur.',
+            'course': exam.course,
+            'exam': exam
+        })
+        
     answers = {a.question_id: a for a in Answer.objects.filter(exam_session=session)}
     current_q = request.GET.get('q')
     if current_q:
