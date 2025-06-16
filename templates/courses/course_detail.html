@@ -2,39 +2,28 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Course Enrollment - Student</title>
+    <title>{{ course.title }} - Detail Kursus</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <style>
-        .course-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
-        }
-        .enrollment-modal {
-            transition: all 0.3s ease;
-        }
-    </style>
 </head>
 <body class="bg-gray-50">
     <!-- Navigation -->
-    <nav class="bg-white shadow-sm">
+    <nav class="bg-white shadow-sm mb-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
                 <div class="flex items-center">
-                    <div class="flex-shrink-0 flex items-center">
-                        <i class="fas fa-graduation-cap text-2xl text-cyan-600 mr-2"></i>
-                        <span class="text-xl font-bold text-gray-800">CourseApp Student</span>
-                    </div>
+                    <i class="fas fa-graduation-cap text-2xl text-cyan-600 mr-2"></i>
+                    <span class="text-xl font-bold text-gray-800">CourseApp Student</span>
                 </div>
                 <div class="flex items-center space-x-4">
-                    <a href="mycourses.html" class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-cyan-600">My Courses</a>
+                    <a href="{% url 'my_courses' %}" class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-cyan-600">Kursus Saya</a>
                     <div class="relative">
                         <button class="flex items-center space-x-1">
-                            <img class="h-8 w-8 rounded-full" src="https://randomuser.me/api/portraits/women/44.jpg" alt="User profile">
-                            <span class="text-sm font-medium">Student User</span>
+                            <img class="h-8 w-8 rounded-full" src="https://randomuser.me/api/portraits/men/44.jpg" alt="User profile">
+                            <span class="text-sm font-medium">{{ request.user.get_full_name|default:request.user.username }}</span>
                         </button>
                     </div>
                 </div>
@@ -42,203 +31,82 @@
         </div>
     </nav>
 
-    <!-- Main Content -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <!-- Page Header -->
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Course Header -->
         <div class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-900">Available Courses</h1>
-            <p class="mt-2 text-lg text-gray-600">Browse and enroll in courses to start learning</p>
-        </div>
-
-        <!-- Course Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <!-- Course Card 1 -->
-            <div class="course-card bg-white rounded-lg shadow-md overflow-hidden transition duration-300">
-                <div class="h-48 bg-blue-500 flex items-center justify-center relative">
-                    <img src="https://images.unsplash.com/photo-1546410531-bb4caa6b424d?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Course thumbnail" class="absolute h-full w-full object-cover">
-                    <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-                        <span class="text-white text-lg font-medium">Web Development</span>
-                    </div>
-                    <span class="absolute top-2 right-2 bg-yellow-400 text-xs font-bold px-2 py-1 rounded-full">NEW</span>
-                </div>
-                <div class="p-6">
-                    <h3 class="text-xl font-bold text-gray-900 mb-2">Web Development Fundamentals</h3>
-                    <p class="text-gray-600 mb-4">Learn HTML, CSS, and JavaScript from scratch and build your first website.</p>
-                    
-                    <div class="flex items-center mb-4">
-                        <img class="h-8 w-8 rounded-full mr-2" src="https://randomuser.me/api/portraits/men/32.jpg" alt="Instructor">
-                        <span class="text-sm text-gray-700">Prof. John Smith</span>
-                    </div>
-                    
-                    <div class="flex justify-between items-center">
-                        <span class="text-xl font-bold text-gray-900">$49.99</span>
-                        <button class="enroll-btn px-4 py-2 bg-cyan-600 text-white rounded-md hover:bg-cyan-700 transition" data-course-id="1" data-course-title="Web Development Fundamentals" data-course-price="49.99">
-                            Enroll Now
-                        </button>
-                    </div>
-                </div>
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ course.title }}</h1>
+            <div class="flex items-center mb-2">
+                <i class="fas fa-chalkboard-teacher text-cyan-600 mr-2"></i>
+                <span class="text-gray-700">{{ course.instructor.get_full_name }}</span>
             </div>
-
-            <!-- Course Card 2 -->
-            <div class="course-card bg-white rounded-lg shadow-md overflow-hidden transition duration-300">
-                <div class="h-48 bg-green-500 flex items-center justify-center relative">
-                    <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Course thumbnail" class="absolute h-full w-full object-cover">
-                    <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-                        <span class="text-white text-lg font-medium">Data Science</span>
-                    </div>
-                </div>
-                <div class="p-6">
-                    <h3 class="text-xl font-bold text-gray-900 mb-2">Data Science Essentials</h3>
-                    <p class="text-gray-600 mb-4">Introduction to Python, Pandas, and data visualization techniques.</p>
-                    
-                    <div class="flex items-center mb-4">
-                        <img class="h-8 w-8 rounded-full mr-2" src="https://randomuser.me/api/portraits/women/44.jpg" alt="Instructor">
-                        <span class="text-sm text-gray-700">Dr. Sarah Johnson</span>
-                    </div>
-                    
-                    <div class="flex justify-between items-center">
-                        <span class="text-xl font-bold text-gray-900">$59.99</span>
-                        <button class="enroll-btn px-4 py-2 bg-cyan-600 text-white rounded-md hover:bg-cyan-700 transition" data-course-id="2" data-course-title="Data Science Essentials" data-course-price="59.99">
-                            Enroll Now
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Course Card 3 -->
-            <div class="course-card bg-white rounded-lg shadow-md overflow-hidden transition duration-300">
-                <div class="h-48 bg-purple-500 flex items-center justify-center relative">
-                    <img src="https://images.unsplash.com/photo-1517694712202-14dd9538aa97?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Course thumbnail" class="absolute h-full w-full object-cover">
-                    <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-                        <span class="text-white text-lg font-medium">Mobile Dev</span>
-                    </div>
-                    <span class="absolute top-2 right-2 bg-red-400 text-white text-xs font-bold px-2 py-1 rounded-full">SALE</span>
-                </div>
-                <div class="p-6">
-                    <h3 class="text-xl font-bold text-gray-900 mb-2">Mobile App Development</h3>
-                    <p class="text-gray-600 mb-4">Build cross-platform mobile apps with Flutter and Dart.</p>
-                    
-                    <div class="flex items-center mb-4">
-                        <img class="h-8 w-8 rounded-full mr-2" src="https://randomuser.me/api/portraits/men/75.jpg" alt="Instructor">
-                        <span class="text-sm text-gray-700">Mr. David Wilson</span>
-                    </div>
-                    
-                    <div class="flex justify-between items-center">
-                        <span class="text-xl font-bold text-gray-900 line-through text-gray-400 mr-2">$79.99</span>
-                        <span class="text-xl font-bold text-red-600">$59.99</span>
-                        <button class="enroll-btn px-4 py-2 bg-cyan-600 text-white rounded-md hover:bg-cyan-700 transition" data-course-id="3" data-course-title="Mobile App Development" data-course-price="59.99">
-                            Enroll Now
-                        </button>
-                    </div>
-                </div>
+            <p class="text-lg text-gray-600 mb-4">{{ course.description }}</p>
+            {% if course.thumbnail %}
+                <img src="{{ course.thumbnail.url }}" alt="Thumbnail" class="rounded-lg mb-4 max-h-64">
+            {% endif %}
+            <div class="flex space-x-4 text-sm text-gray-500">
+                <span><i class="fas fa-users mr-1"></i> {{ course.student_count }} peserta</span>
+                <span><i class="fas fa-layer-group mr-1"></i> {{ course.module_count }} modul</span>
+                <span><i class="fas fa-calendar-alt mr-1"></i> Dibuat: {{ course.created_at|date:"d M Y" }}</span>
             </div>
         </div>
-    </div>
 
-    <!-- Enrollment Modal -->
-    <div id="enrollmentModal" class="fixed z-10 inset-0 overflow-y-auto hidden">
-        <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div class="fixed inset-0 transition-opacity" aria-hidden="true">
-                <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
-            </div>
-            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-            <div class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
-                <div>
-                    <h3 id="modalCourseTitle" class="text-lg leading-6 font-medium text-gray-900"></h3>
-                    <div class="mt-4">
-                        <p class="text-sm text-gray-500">You are about to enroll in:</p>
-                        <div class="mt-2 bg-gray-50 p-4 rounded-md">
-                            <div class="flex justify-between">
-                                <span id="modalCourseName" class="font-medium"></span>
-                                <span id="modalCoursePrice" class="font-bold"></span>
-                            </div>
+        <!-- Modules & Materials -->
+        <div class="mb-10">
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">Modul & Materi</h2>
+            {% if modules %}
+                <div class="space-y-6">
+                    {% for module in modules %}
+                        <div class="bg-white rounded-lg shadow p-4">
+                            <h3 class="text-xl font-semibold text-cyan-700 mb-2">{{ module.title }}</h3>
+                            <p class="text-gray-600 mb-2">{{ module.description }}</p>
+                            {% if module.materials.all %}
+                                <ul class="list-disc ml-6">
+                                    {% for material in module.materials.all %}
+                                        <li class="mb-1">
+                                            <span class="font-medium">{{ material.title }}</span>
+                                            <span class="text-xs text-gray-500 ml-2">({{ material.get_type_display }})</span>
+                                            {% if material.url %}
+                                                <a href="{{ material.url }}" class="text-cyan-600 hover:underline ml-2" target="_blank">Lihat</a>
+                                            {% elif material.file %}
+                                                <a href="{{ material.file.url }}" class="text-cyan-600 hover:underline ml-2" target="_blank">Download</a>
+                                            {% endif %}
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            {% else %}
+                                <p class="text-gray-400 text-sm">Belum ada materi.</p>
+                            {% endif %}
                         </div>
-                    </div>
-                    <div class="mt-6">
-                        <label for="paymentMethod" class="block text-sm font-medium text-gray-700">Payment Method</label>
-                        <select id="paymentMethod" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-cyan-500 focus:border-cyan-500 rounded-md">
-                            <option>Credit/Debit Card</option>
-                            <option>PayPal</option>
-                            <option>Bank Transfer</option>
-                            <option>Other E-Wallet</option>
-                        </select>
-                    </div>
+                    {% endfor %}
                 </div>
-                <div class="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 sm:grid-flow-row-dense">
-                    <button type="button" id="confirmEnrollBtn" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-cyan-600 text-base font-medium text-white hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 sm:col-start-2 sm:text-sm">
-                        Confirm Enrollment
-                    </button>
-                    <button type="button" id="cancelEnrollBtn" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 sm:mt-0 sm:col-start-1 sm:text-sm">
-                        Cancel
-                    </button>
-                </div>
-            </div>
+            {% else %}
+                <p class="text-gray-500">Belum ada modul pada kursus ini.</p>
+            {% endif %}
+        </div>
+
+        <!-- Tasks -->
+        <div>
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">Tugas</h2>
+            {% if tasks %}
+                <ul class="space-y-4">
+                    {% for task in tasks %}
+                        <li class="bg-white rounded-lg shadow p-4">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <h4 class="text-lg font-semibold text-gray-800">{{ task.title }}</h4>
+                                    <p class="text-gray-600">{{ task.description|truncatewords:20 }}</p>
+                                </div>
+                                {% if task.due_date %}
+                                    <span class="text-sm text-red-600"><i class="fas fa-clock mr-1"></i>Deadline: {{ task.due_date|date:"d M Y H:i" }}</span>
+                                {% endif %}
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="text-gray-500">Belum ada tugas pada kursus ini.</p>
+            {% endif %}
         </div>
     </div>
-
-    <!-- Success Notification -->
-    <div id="successNotification" class="fixed bottom-4 right-4 bg-green-500 text-white px-4 py-3 rounded-md shadow-lg hidden">
-        <div class="flex items-center">
-            <i class="fas fa-check-circle mr-2"></i>
-            <span id="successMessage">Enrollment successful! You can now access the course.</span>
-        </div>
-    </div>
-
-    <script>
-        // Enrollment Modal
-        const enrollmentModal = document.getElementById('enrollmentModal');
-        const enrollButtons = document.querySelectorAll('.enroll-btn');
-        const confirmEnrollBtn = document.getElementById('confirmEnrollBtn');
-        const cancelEnrollBtn = document.getElementById('cancelEnrollBtn');
-        const successNotification = document.getElementById('successNotification');
-        
-        let currentCourseId = null;
-        let currentCourseTitle = null;
-        let currentCoursePrice = null;
-
-        // Open enrollment modal
-        enrollButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                currentCourseId = button.getAttribute('data-course-id');
-                currentCourseTitle = button.getAttribute('data-course-title');
-                currentCoursePrice = button.getAttribute('data-course-price');
-                
-                document.getElementById('modalCourseTitle').textContent = 'Confirm Enrollment';
-                document.getElementById('modalCourseName').textContent = currentCourseTitle;
-                document.getElementById('modalCoursePrice').textContent = `$${currentCoursePrice}`;
-                
-                enrollmentModal.classList.remove('hidden');
-            });
-        });
-
-        // Confirm enrollment
-        confirmEnrollBtn.addEventListener('click', () => {
-            // In a real app, this would process payment and enroll the student
-            // For demo, we'll just show a success message
-            
-            enrollmentModal.classList.add('hidden');
-            
-            // Show success notification
-            document.getElementById('successMessage').textContent = `Successfully enrolled in ${currentCourseTitle}!`;
-            successNotification.classList.remove('hidden');
-            
-            // Hide notification after 5 seconds
-            setTimeout(() => {
-                successNotification.classList.add('hidden');
-            }, 5000);
-        });
-
-        // Cancel enrollment
-        cancelEnrollBtn.addEventListener('click', () => {
-            enrollmentModal.classList.add('hidden');
-        });
-
-        // Close modal when clicking outside
-        window.addEventListener('click', (event) => {
-            if (event.target === enrollmentModal) {
-                enrollmentModal.classList.add('hidden');
-            }
-        });
-    </script>
 </body>
 </html>

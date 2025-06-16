@@ -6,13 +6,20 @@ from .forms import CourseForm
 
 @login_required
 def student_course_list(request):
-    # Semua course yang bisa di-enroll student
-    courses = Course.objects.filter(status='published')
-    # Tandai course yang sudah di-enroll user
-    enrolled_ids = Enrollment.objects.filter(user=request.user).values_list('course_id', flat=True)
-    for course in courses:
-        course.is_enrolled = course.id in enrolled_ids
-    return render(request, 'courses/student_course_list.html', {'courses': courses})
+    # Semua course yang published
+    all_courses = Course.objects.filter(status='PUBLISHED')
+    # Course yang sudah di-enroll user
+    enrolled_ids = Enrollment.objects.filter(student=request.user).values_list('course_id', flat=True)
+    my_courses = all_courses.filter(id__in=enrolled_ids)
+    available_courses = all_courses.exclude(id__in=enrolled_ids)
+    for course in available_courses:
+        course.is_enrolled = False
+    for course in my_courses:
+        course.is_enrolled = True
+    return render(request, 'courses/student_course_list.html', {
+        'available_courses': available_courses,
+        'my_courses': my_courses,
+    })
 
 @login_required
 def enroll_course(request, course_id):
@@ -29,11 +36,15 @@ def my_courses(request):
 def course_detail(request, course_id):
     course = get_object_or_404(Course, id=course_id)
     # Pastikan user sudah enroll
-    if not Enrollment.objects.filter(user=request.user, course=course).exists():
+    if not Enrollment.objects.filter(student=request.user, course=course).exists():
         return redirect('student_course_list')
-    return render(request, 'courses/course_detail.html', {'course': course})
-
-
+    modules = course.modules.all().order_by('order')
+    tasks = course.tasks.all()
+    return render(request, 'courses/course_detail.html', {
+        'course': course,
+        'modules': modules,
+        'tasks': tasks,
+    })
 
 @staff_member_required
 def admin_course_list(request):

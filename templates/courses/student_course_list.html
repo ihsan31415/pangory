@@ -1,41 +1,105 @@
-<!-- Student: List semua course yang tersedia -->
-<h2>Daftar Kursus Tersedia</h2>
-<table>
-  <thead>
-    <tr>
-      <th>Judul</th>
-      <th>Instruktur</th>
-      <th>Status</th>
-      <th>Aksi</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for course in available_courses %}
-    <tr>
-      <td>{{ course.title }}</td>
-      <td>{{ course.instructor.get_full_name }}</td>
-      <td>{{ course.status }}</td>
-      <td>
-        {% if course.is_enrolled %}
-          <a href="{% url 'course_detail' course.id %}">Lihat</a>
-        {% else %}
-          <form method="post" action="{% url 'enroll_course' course.id %}">
-            {% csrf_token %}
-            <button type="submit">Daftar</button>
-          </form>
-        {% endif %}
-      </td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Daftar Kursus Tersedia</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm mb-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <i class="fas fa-graduation-cap text-2xl text-cyan-600 mr-2"></i>
+                    <span class="text-xl font-bold text-gray-800">CourseApp Student</span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="{% url 'my_courses' %}" class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-cyan-600">Kursus Saya</a>
+                    <div class="relative">
+                        <button class="flex items-center space-x-1">
+                            <img class="h-8 w-8 rounded-full" src="https://randomuser.me/api/portraits/men/44.jpg" alt="User profile">
+                            <span class="text-sm font-medium">{{ request.user.get_full_name|default:request.user.username }}</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
 
-<!-- Student: List course yang sudah di-enroll -->
-<h2>Kursus Saya</h2>
-<ul>
-  {% for course in my_courses %}
-    <li>
-      <a href="{% url 'course_detail' course.id %}">{{ course.title }}</a>
-    </li>
-  {% endfor %}
-</ul>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Available Courses -->
+        <div class="mb-10">
+            <h2 class="text-3xl font-bold text-gray-900 mb-2">Daftar Kursus Tersedia</h2>
+            <p class="text-lg text-gray-600 mb-6">Pilih kursus yang ingin kamu ikuti dan mulai belajar!</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {% for course in available_courses %}
+              <div class="bg-white rounded-lg shadow-md overflow-hidden transition duration-300 hover:-translate-y-1 hover:shadow-lg">
+                  <div class="h-40 bg-cyan-500 flex items-center justify-center relative">
+                      <i class="fas fa-book-open text-white text-5xl"></i>
+                      <span class="absolute top-2 right-2 bg-yellow-400 text-xs font-bold px-2 py-1 rounded-full">NEW</span>
+                  </div>
+                  <div class="p-6">
+                      <a href="{% url 'course_detail' course.id %}" class="text-xl font-bold text-gray-900 mb-2 hover:text-cyan-700 block">
+                          {{ course.title }}
+                      </a>
+                      <p class="text-gray-600 mb-4">{{ course.description|truncatewords:20 }}</p>
+                      <div class="flex items-center mb-4">
+                          <i class="fas fa-chalkboard-teacher text-cyan-600 mr-2"></i>
+                          <span class="text-sm text-gray-700">{{ course.instructor.get_full_name }}</span>
+                      </div>
+                      <div class="flex justify-between items-center">
+                          <span class="text-sm font-semibold text-green-600">{{ course.status }}</span>
+                          <!-- Form hanya membungkus tombol Daftar -->
+                          <form method="post" action="{% url 'enroll_course' course.id %}">
+                              {% csrf_token %}
+                              <button type="submit" class="px-4 py-2 bg-cyan-600 text-white rounded-md hover:bg-cyan-700 transition">Daftar</button>
+                          </form>
+                      </div>
+                  </div>
+              </div>
+              {% empty %}
+              <div class="col-span-3 text-center text-gray-500 py-8">
+                  Tidak ada kursus baru yang tersedia.
+              </div>
+              {% endfor %}
+          </div>
+        </div>
+
+        <!-- My Courses -->
+        <div>
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">Kursus Saya</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {% for course in my_courses %}
+                <div class="bg-white rounded-lg shadow-md overflow-hidden transition duration-300 hover:-translate-y-1 hover:shadow-lg">
+                    <div class="h-40 bg-green-500 flex items-center justify-center relative">
+                        <i class="fas fa-check-circle text-white text-5xl"></i>
+                        <span class="absolute top-2 right-2 bg-green-400 text-xs font-bold px-2 py-1 rounded-full">ENROLLED</span>
+                    </div>
+                    <div class="p-6">
+                        <a href="{% url 'course_detail' course.id %}" class="text-xl font-bold text-gray-900 mb-2 hover:text-cyan-700 block">
+                            {{ course.title }}
+                        </a>
+                        <p class="text-gray-600 mb-4">{{ course.description|truncatewords:20 }}</p>
+                        <div class="flex items-center mb-4">
+                            <i class="fas fa-chalkboard-teacher text-cyan-600 mr-2"></i>
+                            <span class="text-sm text-gray-700">{{ course.instructor.get_full_name }}</span>
+                        </div>
+                        <a href="{% url 'course_detail' course.id %}" class="inline-block px-4 py-2 bg-cyan-600 text-white rounded-md hover:bg-cyan-700 transition">Lihat Kursus</a>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-span-3 text-center text-gray-500 py-8">
+                    Kamu belum mendaftar kursus apapun.
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        <!-- ...existing code... -->
+    </div>
+</body>
+</html>
