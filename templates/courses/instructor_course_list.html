@@ -1,28 +1,77 @@
-<!-- Instructor: List course yang dia ajar -->
-<h2>Course yang Saya Ajar</h2>
-<table>
-  <thead>
-    <tr>
-      <th>Judul</th>
-      <th>Status</th>
-      <th>Jumlah Siswa</th>
-      <th>Aksi</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for course in courses %}
-    <tr>
-      <td>{{ course.title }}</td>
-      <td>{{ course.status }}</td>
-      <td>{{ course.student_count }}</td>
-      <td>
-        <a href="{% url 'edit_course' course.id %}">Edit</a>
-        <a href="{% url 'course_modules' course.id %}">Kelola Modul</a>
-        <a href="{% url 'course_tasks' course.id %}">Kelola Tugas</a>
-        <a href="{% url 'course_enrollments' course.id %}">Lihat Siswa</a>
-      </td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
-<a href="{% url 'add_course' %}">Tambah Course Baru</a>
+{% extends "base.html" %}
+{% block title %}Kursus yang Saya Ajar{% endblock %}
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold text-gray-900">Kursus yang Saya Ajar</h2>
+        <a href="{% url 'instructor_course_add' %}" class="px-4 py-2 bg-cyan-600 text-white rounded-md hover:bg-cyan-700 transition">
+            <i class="fas fa-plus mr-2"></i>Tambah Kursus Baru
+        </a>
+    </div>
+
+    <div class="bg-white shadow-md rounded-lg overflow-hidden">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Judul</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jumlah Siswa</th>
+                    <th class="px-8 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                {% for course in courses %}
+                <tr>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm font-semibold text-gray-900">{{ course.title }}</div>
+                        <div class="text-xs text-gray-500 mb-1">Deskripsi Kursus: {{ course.description|truncatewords:20 }}{% if course.description|length > 100 %}...{% endif %}</div>
+                        <a href="{% url 'course_detail' course.id %}" class="inline-block text-xs text-blue-600 hover:underline">Lihat Selengkapnya</a>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                            {% if course.status == 'PUBLISHED' %}bg-green-100 text-green-800
+                            {% elif course.status == 'DRAFT' %}bg-yellow-100 text-yellow-800
+                            {% else %}bg-gray-100 text-gray-800{% endif %}">
+                            {{ course.status }}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {{ course.student_count }} siswa
+                    </td>
+                    <td class="px-8 py-4 whitespace-nowrap text-sm font-medium space-x-2">
+                        {% if course.id %}
+                        <span style="color: red; font-size: 10px;">DEBUG: Kolom Aksi Rendered (ID: {{ course.id }})</span><br>
+                        <a href="{% url 'instructor_course_edit' course.id %}" class="text-cyan-600 hover:text-cyan-900">
+                            <i class="fas fa-edit"></i> Edit
+                        </a>
+                        <a href="{% url 'course_modules' course.id %}" class="text-blue-600 hover:text-blue-900">
+                            <i class="fas fa-layer-group"></i> Modul
+                        </a>
+                        <a href="{% url 'course_tasks' course.id %}" class="text-purple-600 hover:text-purple-900">
+                            <i class="fas fa-tasks"></i> Tugas
+                        </a>
+                        <a href="{% url 'course_enrollments' course.id %}" class="text-green-600 hover:text-green-900">
+                            <i class="fas fa-users"></i> Siswa
+                        </a>
+                        <a href="{% url 'instructor_course_delete' course.id %}" class="text-red-600 hover:text-red-900" 
+                           onclick="return confirm('Apakah Anda yakin ingin menghapus kursus ini?')">
+                            <i class="fas fa-trash"></i> Hapus
+                        </a>
+                        {% else %}
+                        <span style="color: red; font-size: 10px;">DEBUG: Kolom Aksi Tidak Ada ID</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="px-6 py-4 text-center text-gray-500">
+                        Belum ada kursus yang Anda ajar. 
+                        <a href="{% url 'instructor_course_add' %}" class="text-cyan-600 hover:text-cyan-900">Tambah kursus baru</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

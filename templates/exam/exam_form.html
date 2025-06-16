@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ action }} Ujian - {{ course.title }}{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 py-8">
+    <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="mb-8">
+            <h1 class="text-2xl font-bold text-gray-900">{{ action }} Ujian</h1>
+            <p class="mt-2 text-sm text-gray-600">Kursus: {{ course.title }}</p>
+        </div>
+        <div class="bg-white shadow rounded-lg overflow-hidden">
+            <form method="post" class="space-y-6 p-6">
+                {% csrf_token %}
+                <div>
+                    <label for="id_title" class="block text-sm font-medium text-gray-700">Judul Ujian</label>
+                    {{ form.title }}
+                </div>
+                <div>
+                    <label for="id_description" class="block text-sm font-medium text-gray-700">Deskripsi</label>
+                    {{ form.description }}
+                </div>
+                <div>
+                    <label for="id_duration_minutes" class="block text-sm font-medium text-gray-700">Durasi (menit)</label>
+                    {{ form.duration_minutes }}
+                </div>
+                <div>
+                    <label for="id_passing_score" class="block text-sm font-medium text-gray-700">Nilai Lulus (%)</label>
+                    {{ form.passing_score }}
+                </div>
+                <div class="flex justify-end space-x-3 pt-4 border-t">
+                    <a href="{% url 'exam_list' course.id %}" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                        <i class="fas fa-times mr-2"></i>Batal
+                    </a>
+                    <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
+                        <i class="fas fa-save mr-2"></i>{{ action }} Ujian
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %} 

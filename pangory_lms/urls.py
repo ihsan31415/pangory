@@ -58,6 +58,8 @@ urlpatterns = [
     path('courses/<int:course_id>/exams/<int:exam_id>/start/', exams_views.start_exam, name='start_exam'),
     path('courses/<int:course_id>/exams/session/<int:session_id>/', exams_views.exam_session, name='exam_session'),
     path('courses/<int:course_id>/exams/session/<int:session_id>/submit/', exams_views.submit_answer, name='submit_answer'),
+    path('courses/<int:course_id>/exams/<int:exam_id>/questions/add/', exams_views.add_question, name='add_question'),
+    path('courses/<int:course_id>/exams/<int:exam_id>/delete/', exams_views.delete_exam, name='delete_exam'),
 
     # sertifikat
     path('courses/<int:course_id>/certificates/', certificates_views.certificate_list, name='certificate_list'),
@@ -67,10 +69,21 @@ urlpatterns = [
     path('dashboard/', views.student_dashboard, name='student_dashboard'),
 
     # untuk pengajar
-    # path('instructor/courses/', courses_views.instructor_course_list, name='instructor_course_list'),
-    # path('instructor/courses/add/', courses_views.instructor_course_add, name='instructor_course_add'),
-    # path('instructor/courses/<int:course_id>/edit/', courses_views.instructor_course_edit, name='instructor_course_edit'),
-    # path('instructor/courses/<int:course_id>/delete/', courses_views.instructor_course_delete, name='instructor_course_delete'),
+    path('instructor/courses/', courses_views.instructor_course_list, name='instructor_course_list'),
+    path('instructor/courses/add/', courses_views.instructor_course_add, name='instructor_course_add'),
+    path('instructor/courses/<int:course_id>/edit/', courses_views.instructor_course_edit, name='instructor_course_edit'),
+    path('instructor/courses/<int:course_id>/delete/', courses_views.instructor_course_delete, name='instructor_course_delete'),
+    
+    # Course management URLs
+    path('instructor/courses/<int:course_id>/modules/', courses_views.course_modules, name='course_modules'),
+    path('instructor/courses/<int:course_id>/tasks/', courses_views.course_tasks, name='course_tasks'),
+    path('instructor/courses/<int:course_id>/enrollments/', courses_views.course_enrollments, name='course_enrollments'),
+    path('instructor/courses/<int:course_id>/modules/add/', courses_views.add_module, name='add_module'),
+    path('instructor/courses/<int:course_id>/modules/<int:module_id>/edit/', courses_views.edit_module, name='edit_module'),
+    path('instructor/courses/<int:course_id>/modules/<int:module_id>/delete/', courses_views.delete_module, name='delete_module'),
+    path('instructor/courses/<int:course_id>/tasks/add/', courses_views.add_task, name='add_task'),
+    path('instructor/courses/<int:course_id>/tasks/<int:task_id>/edit/', courses_views.edit_task, name='edit_task'),
+    path('instructor/courses/<int:course_id>/tasks/<int:task_id>/delete/', courses_views.delete_task, name='delete_task'),
 
     path('courses/<int:course_id>/player/<int:material_id>/', courses_views.course_player, name='course_player'),
 
@@ -78,6 +91,13 @@ urlpatterns = [
     path('password_reset/done/', auth_views.PasswordResetDoneView.as_view(template_name='auth/password_reset_done.html'), name='password_reset_done'),
     path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(template_name='auth/password_reset_confirm.html'), name='password_reset_confirm'),
     path('reset/done/', auth_views.PasswordResetCompleteView.as_view(template_name='auth/password_reset_complete.html'), name='password_reset_complete'),
+
+    path('instructor/modules/<int:module_id>/materials/add/', courses_views.add_material, name='add_material'),
+    path('instructor/modules/<int:module_id>/materials/<int:material_id>/edit/', courses_views.edit_material, name='edit_material'),
+
+    path('instructor/courses/<int:course_id>/exams/add/', exams_views.add_exam, name='add_exam'),
+
+    path('instructor/dashboard/', views.instructor_dashboard, name='instructor_dashboard'),
 ]
 
 # Serve media files in development

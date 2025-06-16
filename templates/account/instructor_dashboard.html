@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block title %}Dashboard Instruktur - Pangory{% endblock %}
+{% block content %}
+<div class="hero-gradient">
+    <div class="max-w-7xl mx-auto py-10 px-4 sm:py-14 sm:px-6 lg:py-20 lg:px-8">
+        <div class="text-center">
+            <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white">
+                <span class="block">Dashboard Instruktur</span>
+            </h1>
+            <p class="mt-4 max-w-lg mx-auto text-lg sm:text-xl text-cyan-100">
+                Selamat datang! Kelola kursus, tugas, ujian, dan pantau aktivitas siswa Anda di sini.
+            </p>
+        </div>
+    </div>
+</div>
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-16 relative z-10">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="card bg-white rounded-lg shadow p-6 flex flex-col items-center">
+            <div class="h-12 w-12 flex items-center justify-center rounded-full bg-cyan-100 mb-3">
+                <i class="fas fa-chalkboard-teacher text-cyan-600 text-2xl"></i>
+            </div>
+            <div class="text-2xl font-bold text-gray-800">{{ total_courses }}</div>
+            <div class="text-gray-500">Kursus Diampu</div>
+        </div>
+        <div class="card bg-white rounded-lg shadow p-6 flex flex-col items-center">
+            <div class="h-12 w-12 flex items-center justify-center rounded-full bg-green-100 mb-3">
+                <i class="fas fa-users text-green-600 text-2xl"></i>
+            </div>
+            <div class="text-2xl font-bold text-gray-800">{{ total_students }}</div>
+            <div class="text-gray-500">Total Siswa</div>
+        </div>
+        <div class="card bg-white rounded-lg shadow p-6 flex flex-col items-center">
+            <div class="h-12 w-12 flex items-center justify-center rounded-full bg-purple-100 mb-3">
+                <i class="fas fa-tasks text-purple-600 text-2xl"></i>
+            </div>
+            <div class="text-2xl font-bold text-gray-800">{{ total_tasks }}</div>
+            <div class="text-gray-500">Total Tugas</div>
+        </div>
+        <div class="card bg-white rounded-lg shadow p-6 flex flex-col items-center">
+            <div class="h-12 w-12 flex items-center justify-center rounded-full bg-pink-100 mb-3">
+                <i class="fas fa-file-alt text-pink-600 text-2xl"></i>
+            </div>
+            <div class="text-2xl font-bold text-gray-800">{{ total_exams }}</div>
+            <div class="text-gray-500">Total Ujian</div>
+        </div>
+    </div>
+
+    <div class="mt-10">
+        <h2 class="text-xl font-bold text-gray-800 mb-4">Notifikasi</h2>
+        <ul class="mb-8">
+            {% for notif in notifications %}
+            <li class="bg-cyan-50 border-l-4 border-cyan-400 p-4 mb-2 rounded">
+                <span class="font-semibold text-cyan-700">{{ notif.message }}</span>
+                <span class="text-xs text-gray-400 ml-2">{{ notif.timestamp|date:"d M Y H:i" }}</span>
+            </li>
+            {% empty %}
+            <li class="text-gray-500">Tidak ada notifikasi.</li>
+            {% endfor %}
+        </ul>
+
+        <div class="mb-6 flex items-center justify-between">
+            <h2 class="text-2xl font-bold text-gray-800">Kursus yang Saya Ajar</h2>
+            <a href="{% url 'instructor_course_add' %}" class="text-cyan-600 hover:underline font-medium">Tambah Kursus</a>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for course in courses %}
+            <div class="bg-white rounded-lg shadow p-5 flex flex-col">
+                <h3 class="text-lg font-bold text-gray-900 mb-2">{{ course.title }}</h3>
+                <div class="text-gray-500 text-sm mb-2">{{ course.description|truncatewords:20 }}</div>
+                <div class="flex items-center text-xs text-gray-500 mb-2">
+                    <i class="fas fa-users mr-1"></i> {{ course.enrollments.count }} siswa
+                </div>
+                <div class="flex items-center text-xs text-gray-500 mb-2">
+                    <i class="fas fa-tasks mr-1"></i> {{ course.tasks.count }} tugas
+                </div>
+                <div class="flex items-center text-xs text-gray-500 mb-4">
+                    <i class="fas fa-file-alt mr-1"></i> {{ course.exams.count }} ujian
+                </div>
+                <a href="{% url 'course_detail' course.id %}" class="mt-auto inline-block px-4 py-2 rounded-md bg-cyan-600 text-white font-medium hover:bg-cyan-700 transition">Kelola Kursus</a>
+            </div>
+            {% empty %}
+            <div class="col-span-3 text-gray-500 text-center">Belum ada kursus yang Anda ajar.</div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

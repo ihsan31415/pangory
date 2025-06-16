@@ -12,6 +12,7 @@
                     <div class="text-gray-500 text-sm">{{ exam.description }}</div>
                 </div>
                 <a href="{% url 'exam_detail' course.id exam.id %}" class="bg-cyan-600 text-white px-4 py-2 rounded hover:bg-cyan-700">Lihat</a>
+                <a href="{% url 'delete_exam' course.id exam.id %}" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 ml-2" onclick="return confirm('Apakah Anda yakin ingin menghapus ujian ini?')">Hapus</a>
             </li>
             {% endfor %}
         </ul>

@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ action }} Kursus{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="max-w-2xl mx-auto">
+        <div class="bg-white shadow sm:rounded-lg">
+            <div class="px-4 py-5 sm:p-6">
+                <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">
+                    {{ action }} Kursus
+                </h3>
+                <form method="post" enctype="multipart/form-data" class="space-y-4">
+                    {% csrf_token %}
+                    {% if form.non_field_errors %}
+                        <div class="text-red-600 text-sm mb-2">
+                            {{ form.non_field_errors }}
+                        </div>
+                    {% endif %}
+                    <div>
+                        <label for="id_title" class="block text-sm font-medium text-gray-700">Judul Kursus</label>
+                        {{ form.title }}
+                        {% if form.title.errors %}
+                            <div class="text-red-600 text-xs">{{ form.title.errors }}</div>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <label for="id_description" class="block text-sm font-medium text-gray-700">Deskripsi</label>
+                        {{ form.description }}
+                        {% if form.description.errors %}
+                            <div class="text-red-600 text-xs">{{ form.description.errors }}</div>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <label for="id_status" class="block text-sm font-medium text-gray-700">Status</label>
+                        {{ form.status }}
+                        {% if form.status.errors %}
+                            <div class="text-red-600 text-xs">{{ form.status.errors }}</div>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <label for="id_thumbnail" class="block text-sm font-medium text-gray-700">Thumbnail (opsional)</label>
+                        {{ form.thumbnail }}
+                        {% if form.thumbnail.errors %}
+                            <div class="text-red-600 text-xs">{{ form.thumbnail.errors }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="flex justify-end space-x-3">
+                        <a href="{% url 'instructor_course_list' %}" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">Batal</a>
+                        <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">{{ action }} Kursus</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

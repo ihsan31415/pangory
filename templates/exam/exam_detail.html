@@ -5,9 +5,12 @@
     <h2 class="text-2xl font-bold mb-2">{{ exam.title }}</h2>
     <div class="mb-2 text-gray-600">{{ exam.description }}</div>
     <div class="mb-4">
-        <span class="mr-4">Durasi: {{ exam.duration_minutes }} menit</span>
-        <span>Jumlah Soal: {{ exam.question_count }}</span>
+        <span class="mr-4">Durasi: <b>{{ exam.duration_minutes }}</b> menit</span>
+        <span>Jumlah Soal: <b>{{ exam.question_count }}</b></span>
     </div>
+    {% if user == exam.course.instructor or user.is_staff or user.is_superuser %}
+        <a href="#" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 mb-4 inline-block"><i class="fas fa-plus mr-2"></i>Tambah Soal</a>
+    {% endif %}
     {% if session %}
         <a href="{% url 'exam_session' course.id session.id %}" class="bg-cyan-600 text-white px-4 py-2 rounded">Lanjutkan Ujian</a>
     {% else %}

@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block title %}Hapus Tugas - {{ task.title }}{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="max-w-2xl mx-auto">
+        <div class="bg-white shadow sm:rounded-lg">
+            <div class="px-4 py-5 sm:p-6">
+                <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">
+                    Hapus Tugas
+                </h3>
+                <div class="mt-2 max-w-xl text-sm text-gray-500">
+                    <p>Apakah Anda yakin ingin menghapus tugas "{{ task.title }}" dari kursus "{{ course.title }}"?</p>
+                    <p class="mt-2 text-red-600">Tindakan ini tidak dapat dibatalkan.</p>
+                </div>
+                <form method="post" class="mt-5">
+                    {% csrf_token %}
+                    <div class="flex justify-end space-x-3">
+                        <a href="{% url 'course_tasks' course.id %}" 
+                           class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                            Batal
+                        </a>
+                        <button type="submit"
+                                class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700">
+                            Hapus Tugas
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

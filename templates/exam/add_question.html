@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Tambah Soal - {{ exam.title }}{% endblock %}
+{% block content %}
+<div class="max-w-xl mx-auto py-8">
+    <h2 class="text-2xl font-bold mb-4">Tambah Soal untuk {{ exam.title }}</h2>
+    <form method="post">
+        {% csrf_token %}
+        <div class="mb-4">
+            <label class="block font-semibold mb-1">Teks Soal</label>
+            {{ q_form.text }}
+        </div>
+        <div class="mb-4 flex gap-4">
+            <div>
+                <label class="block font-semibold mb-1">Poin</label>
+                {{ q_form.points }}
+            </div>
+            <div>
+                <label class="block font-semibold mb-1">Urutan</label>
+                {{ q_form.order }}
+            </div>
+        </div>
+        <div class="mb-4">
+            <label class="block font-semibold mb-2">Pilihan Jawaban (a, b, c, d)</label>
+            {{ formset.management_form }}
+            <div class="grid grid-cols-1 gap-2">
+                {% for form in formset.forms %}
+                <div class="flex items-center gap-2 bg-gray-50 p-2 rounded">
+                    <span class="font-bold">
+                      {% if forloop.counter == 1 %}A.{% elif forloop.counter == 2 %}B.{% elif forloop.counter == 3 %}C.{% elif forloop.counter == 4 %}D.{% endif %}
+                    </span>
+                    {{ form.text }}
+                    <label class="ml-2 flex items-center">
+                        {{ form.is_correct }} <span class="ml-1 text-xs">Kunci</span>
+                    </label>
+                    {{ form.order }}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="flex gap-2 mt-6">
+            <button type="submit" class="bg-cyan-600 text-white px-4 py-2 rounded hover:bg-cyan-700">Simpan</button>
+            <button type="submit" name="add_another" value="1" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Simpan &amp; Tambah Lagi</button>
+            <a href="{% url 'exam_detail' course.id exam.id %}" class="bg-gray-300 text-gray-700 px-4 py-2 rounded">Kembali</a>
+        </div>
+    </form>
+</div>
+{% endblock %} 

@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ action }} Tugas - {{ course.title }}{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 py-8">
+    <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="mb-8">
+            <h1 class="text-2xl font-bold text-gray-900">{{ action }} Tugas</h1>
+            <p class="mt-2 text-sm text-gray-600">Kursus: {{ course.title }}</p>
+        </div>
+        <div class="bg-white shadow rounded-lg overflow-hidden">
+            <form method="post" class="space-y-6 p-6">
+                {% csrf_token %}
+                <div>
+                    <label for="title" class="block text-sm font-medium text-gray-700">Judul Tugas</label>
+                    <input type="text" name="title" id="title" value="{{ task.title|default_if_none:'' }}" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                <div>
+                    <label for="description" class="block text-sm font-medium text-gray-700">Deskripsi</label>
+                    <textarea name="description" id="description" rows="4" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500">{{ task.description|default_if_none:'' }}</textarea>
+                </div>
+                <div>
+                    <label for="due_date" class="block text-sm font-medium text-gray-700">Deadline</label>
+                    <input type="datetime-local" name="due_date" id="due_date" value="{{ task.due_date|date:'Y-m-d\TH:i' }}" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                <div>
+                    <label for="points" class="block text-sm font-medium text-gray-700">Poin (opsional)</label>
+                    <input type="number" name="points" id="points" value="{{ task.points|default_if_none:100 }}" min="0" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                <div class="flex justify-end space-x-3 pt-4 border-t">
+                    <a href="{% url 'course_detail' course.id %}" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                        <i class="fas fa-times mr-2"></i>Batal
+                    </a>
+                    <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
+                        <i class="fas fa-save mr-2"></i>{{ action }} Tugas
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,213 @@
+{% extends 'base.html' %}
+{% load youtube_extras %}
+
+{% block title %}{{ action }} Materi - {{ module.title }}{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 py-8">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-2xl font-bold text-gray-900">{{ action }} Materi</h1>
+            <p class="mt-2 text-sm text-gray-600">Modul: {{ module.title }}</p>
+        </div>
+
+        <!-- Form Card -->
+        <div class="bg-white shadow rounded-lg overflow-hidden">
+            <form method="post" enctype="multipart/form-data" class="space-y-6 p-6">
+                {% csrf_token %}
+                
+                {% if form.non_field_errors %}
+                    <div class="rounded-md bg-red-50 p-4 mb-6">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-exclamation-circle text-red-400"></i>
+                            </div>
+                            <div class="ml-3">
+                                <h3 class="text-sm font-medium text-red-800">Terjadi kesalahan</h3>
+                                <div class="mt-2 text-sm text-red-700">
+                                    {{ form.non_field_errors }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+
+                <!-- Title -->
+                <div>
+                    <label for="{{ form.title.id_for_label }}" class="block text-sm font-medium text-gray-700">Judul Materi</label>
+                    <div class="mt-1">
+                        {{ form.title }}
+                    </div>
+                    {% if form.title.errors %}
+                        <p class="mt-2 text-sm text-red-600">{{ form.title.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Description -->
+                <div>
+                    <label for="{{ form.description.id_for_label }}" class="block text-sm font-medium text-gray-700">Deskripsi</label>
+                    <div class="mt-1">
+                        {{ form.description }}
+                    </div>
+                    {% if form.description.errors %}
+                        <p class="mt-2 text-sm text-red-600">{{ form.description.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Type -->
+                <div>
+                    <label for="{{ form.type.id_for_label }}" class="block text-sm font-medium text-gray-700">Tipe Materi</label>
+                    <div class="mt-1">
+                        {{ form.type }}
+                    </div>
+                    {% if form.type.errors %}
+                        <p class="mt-2 text-sm text-red-600">{{ form.type.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Content (for non-video materials) -->
+                <div id="contentField" class="hidden">
+                    <label for="{{ form.content.id_for_label }}" class="block text-sm font-medium text-gray-700">Konten</label>
+                    <div class="mt-1">
+                        {{ form.content }}
+                    </div>
+                    {% if form.content.errors %}
+                        <p class="mt-2 text-sm text-red-600">{{ form.content.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- File Upload -->
+                <div id="fileField" class="hidden">
+                    <label for="{{ form.file.id_for_label }}" class="block text-sm font-medium text-gray-700">File</label>
+                    <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+                        <div class="space-y-1 text-center">
+                            <i class="fas fa-cloud-upload-alt text-gray-400 text-3xl mb-3"></i>
+                            <div class="flex text-sm text-gray-600">
+                                <label for="{{ form.file.id_for_label }}" class="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500">
+                                    <span>Upload file</span>
+                                    {{ form.file }}
+                                </label>
+                                <p class="pl-1">atau drag and drop</p>
+                            </div>
+                            <p class="text-xs text-gray-500">PDF, DOC, PPT, atau file lainnya</p>
+                        </div>
+                    </div>
+                    {% if form.file.errors %}
+                        <p class="mt-2 text-sm text-red-600">{{ form.file.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- YouTube URL -->
+                <div id="youtubeField" class="hidden">
+                    <label for="{{ form.url.id_for_label }}" class="block text-sm font-medium text-gray-700">URL YouTube</label>
+                    <div class="mt-1">
+                        {{ form.url }}
+                    </div>
+                    <p class="mt-2 text-sm text-gray-500">
+                        <i class="fas fa-info-circle mr-1"></i>
+                        Masukkan URL video YouTube (contoh: https://youtube.com/watch?v=...)
+                    </p>
+                    {% if form.url.errors %}
+                        <p class="mt-2 text-sm text-red-600">{{ form.url.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- YouTube Preview -->
+                <div id="youtubePreview" class="hidden">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Preview Video</label>
+                    <div class="aspect-w-16 aspect-h-9 rounded-lg overflow-hidden shadow-lg">
+                        <iframe id="youtubePlayer" class="w-full h-full" frameborder="0" allowfullscreen></iframe>
+                    </div>
+                </div>
+
+                <!-- Order -->
+                <div>
+                    <label for="{{ form.order.id_for_label }}" class="block text-sm font-medium text-gray-700">Urutan</label>
+                    <div class="mt-1">
+                        {{ form.order }}
+                    </div>
+                    {% if form.order.errors %}
+                        <p class="mt-2 text-sm text-red-600">{{ form.order.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex justify-end space-x-3 pt-4 border-t">
+                    <a href="{% url 'course_detail' course.id %}" 
+                       class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        <i class="fas fa-times mr-2"></i>
+                        Batal
+                    </a>
+                    <button type="submit" 
+                            class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        <i class="fas fa-save mr-2"></i>
+                        {{ action }} Materi
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const typeSelect = document.querySelector('#{{ form.type.id_for_label }}');
+    const contentField = document.querySelector('#contentField');
+    const fileField = document.querySelector('#fileField');
+    const youtubeField = document.querySelector('#youtubeField');
+    const youtubePreview = document.querySelector('#youtubePreview');
+    const youtubePlayer = document.querySelector('#youtubePlayer');
+    const urlInput = document.querySelector('#{{ form.url.id_for_label }}');
+
+    function updateFields() {
+        const selectedType = typeSelect.value;
+        
+        // Hide all fields first
+        contentField.classList.add('hidden');
+        fileField.classList.add('hidden');
+        youtubeField.classList.add('hidden');
+        youtubePreview.classList.add('hidden');
+
+        // Show relevant fields based on type
+        if (selectedType === 'VIDEO') {
+            youtubeField.classList.remove('hidden');
+            if (urlInput.value) {
+                youtubePreview.classList.remove('hidden');
+            }
+        } else if (selectedType === 'FILE') {
+            fileField.classList.remove('hidden');
+        } else {
+            contentField.classList.remove('hidden');
+        }
+    }
+
+    // Update fields on type change
+    typeSelect.addEventListener('change', updateFields);
+
+    // Update YouTube preview on URL change
+    urlInput.addEventListener('input', function() {
+        const url = this.value;
+        if (url && (url.includes('youtube.com') || url.includes('youtu.be'))) {
+            const videoId = extractYouTubeId(url);
+            if (videoId) {
+                youtubePlayer.src = `https://www.youtube.com/embed/${videoId}`;
+                youtubePreview.classList.remove('hidden');
+            }
+        } else {
+            youtubePreview.classList.add('hidden');
+        }
+    });
+
+    // Extract YouTube video ID from URL
+    function extractYouTubeId(url) {
+        const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+        const match = url.match(regExp);
+        return (match && match[2].length === 11) ? match[2] : null;
+    }
+
+    // Initial update
+    updateFields();
+});
+</script>
+{% endblock %} 

@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .models import Course, Enrollment, Module, Task, TaskSubmission, Material
 from django.contrib.admin.views.decorators import staff_member_required
-from .forms import CourseForm 
+from .forms import CourseForm, MaterialForm
 from django.http import HttpResponseForbidden
 
 def student_course_list(request):
@@ -47,12 +47,21 @@ def course_detail(request, course_id):
     tasks = course.tasks.all()
     student_count = course.students.count()
     module_count = modules.count()
+    # Hitung apakah ada video youtube di materi
+    has_video = any(
+        material.type == 'VIDEO' and material.url and (
+            'youtube.com' in material.url or 'youtu.be' in material.url
+        )
+        for module in modules
+        for material in module.materials.all()
+    )
     return render(request, 'courses/course_detail.html', {
         'course': course,
         'modules': modules,
         'tasks': tasks,
         'student_count': student_count,
         'module_count': module_count,
+        'has_video': has_video,
     })
 
 @login_required
@@ -194,3 +203,157 @@ def course_player(request, course_id, material_id):
         'prev_material': prev_material,
         'next_material': next_material,
     })
+
+@login_required
+def course_modules(request, course_id):
+    course = get_object_or_404(Course, id=course_id, instructor=request.user)
+    modules = course.modules.all().order_by('order')
+    return render(request, 'courses/course_modules.html', {
+        'course': course,
+        'modules': modules,
+    })
+
+@login_required
+def course_tasks(request, course_id):
+    course = get_object_or_404(Course, id=course_id, instructor=request.user)
+    tasks = course.tasks.all().order_by('due_date')
+    return render(request, 'courses/course_tasks.html', {
+        'course': course,
+        'tasks': tasks,
+    })
+
+@login_required
+def course_enrollments(request, course_id):
+    course = get_object_or_404(Course, id=course_id, instructor=request.user)
+    enrollments = course.enrollments.select_related('student').all()
+    return render(request, 'courses/course_enrollments.html', {
+        'course': course,
+        'enrollments': enrollments,
+    })
+
+@login_required
+def add_module(request, course_id):
+    course = get_object_or_404(Course, id=course_id, instructor=request.user)
+    if request.method == 'POST':
+        title = request.POST.get('title')
+        description = request.POST.get('description')
+        order = request.POST.get('order')
+        module = Module.objects.create(
+            course=course,
+            title=title,
+            description=description,
+            order=order
+        )
+        return redirect('course_modules', course_id=course.id)
+    return render(request, 'courses/module_form.html', {
+        'course': course,
+        'action': 'Tambah',
+    })
+
+@login_required
+def edit_module(request, course_id, module_id):
+    course = get_object_or_404(Course, id=course_id, instructor=request.user)
+    module = get_object_or_404(Module, id=module_id, course=course)
+    if request.method == 'POST':
+        module.title = request.POST.get('title')
+        module.description = request.POST.get('description')
+        module.order = request.POST.get('order')
+        module.save()
+        return redirect('course_modules', course_id=course.id)
+    return render(request, 'courses/module_form.html', {
+        'course': course,
+        'module': module,
+        'action': 'Edit',
+    })
+
+@login_required
+def delete_module(request, course_id, module_id):
+    course = get_object_or_404(Course, id=course_id, instructor=request.user)
+    module = get_object_or_404(Module, id=module_id, course=course)
+    if request.method == 'POST':
+        module.delete()
+        return redirect('course_modules', course_id=course.id)
+    return render(request, 'courses/module_confirm_delete.html', {
+        'course': course,
+        'module': module,
+    })
+
+@login_required
+def add_task(request, course_id):
+    course = get_object_or_404(Course, id=course_id, instructor=request.user)
+    if request.method == 'POST':
+        title = request.POST.get('title')
+        description = request.POST.get('description')
+        due_date = request.POST.get('due_date')
+        task = Task.objects.create(
+            course=course,
+            title=title,
+            description=description,
+            due_date=due_date
+        )
+        return redirect('course_tasks', course_id=course.id)
+    return render(request, 'courses/task_form.html', {
+        'course': course,
+        'action': 'Tambah',
+    })
+
+@login_required
+def edit_task(request, course_id, task_id):
+    course = get_object_or_404(Course, id=course_id, instructor=request.user)
+    task = get_object_or_404(Task, id=task_id, course=course)
+    if request.method == 'POST':
+        task.title = request.POST.get('title')
+        task.description = request.POST.get('description')
+        task.due_date = request.POST.get('due_date')
+        task.save()
+        return redirect('course_tasks', course_id=course.id)
+    return render(request, 'courses/task_form.html', {
+        'course': course,
+        'task': task,
+        'action': 'Edit',
+    })
+
+@login_required
+def delete_task(request, course_id, task_id):
+    course = get_object_or_404(Course, id=course_id, instructor=request.user)
+    task = get_object_or_404(Task, id=task_id, course=course)
+    if request.method == 'POST':
+        task.delete()
+        return redirect('course_tasks', course_id=course.id)
+    return render(request, 'courses/task_confirm_delete.html', {
+        'course': course,
+        'task': task,
+    })
+
+@login_required
+def add_material(request, module_id):
+    module = get_object_or_404(Module, id=module_id)
+    course = module.course
+    if request.user != course.instructor and not request.user.is_staff:
+        return HttpResponseForbidden("Anda tidak berhak menambah materi pada modul ini.")
+    if request.method == 'POST':
+        form = MaterialForm(request.POST, request.FILES)
+        if form.is_valid():
+            material = form.save(commit=False)
+            material.module = module
+            material.save()
+            return redirect('course_detail', course_id=course.id)
+    else:
+        form = MaterialForm()
+    return render(request, 'courses/material_form.html', {'form': form, 'module': module, 'course': course, 'action': 'Tambah'})
+
+@login_required
+def edit_material(request, module_id, material_id):
+    module = get_object_or_404(Module, id=module_id)
+    material = get_object_or_404(Material, id=material_id, module=module)
+    course = module.course
+    if request.user != course.instructor and not request.user.is_staff:
+        return HttpResponseForbidden("Anda tidak berhak mengedit materi pada modul ini.")
+    if request.method == 'POST':
+        form = MaterialForm(request.POST, request.FILES, instance=material)
+        if form.is_valid():
+            form.save()
+            return redirect('course_detail', course_id=course.id)
+    else:
+        form = MaterialForm(instance=material)
+    return render(request, 'courses/material_form.html', {'form': form, 'module': module, 'course': course, 'action': 'Edit'})

@@ -3,13 +3,17 @@ from django.contrib.auth.decorators import login_required
 from exams.models import Exam, ExamSession, Question, QuestionOption, Answer, ExamSessionStatus, QuestionType
 from courses.models import Course, Enrollment
 from django.urls import reverse
+from django import forms
+from django.http import HttpResponseForbidden
+from django.forms import ModelForm, inlineformset_factory
 
 @login_required
 def exam_list(request, course_id):
     course = get_object_or_404(Course, id=course_id)
-    # Hanya yang sudah enroll
-    if not Enrollment.objects.filter(student=request.user, course=course).exists():
-        return render(request, 'exam/not_enrolled.html', {'course': course})
+    # Hanya siswa yang harus enroll, instruktur/staff/superuser boleh akses
+    if request.user != course.instructor and not request.user.is_staff and not request.user.is_superuser:
+        if not Enrollment.objects.filter(student=request.user, course=course).exists():
+            return render(request, 'exam/not_enrolled.html', {'course': course})
     exams = Exam.objects.filter(course=course)
     return render(request, 'exam/exam_list.html', {'course': course, 'exams': exams})
 
@@ -17,10 +21,14 @@ def exam_list(request, course_id):
 def exam_detail(request, course_id, exam_id):
     course = get_object_or_404(Course, id=course_id)
     exam = get_object_or_404(Exam, id=exam_id, course=course)
-    if not Enrollment.objects.filter(student=request.user, course=course).exists():
-        return render(request, 'exam/not_enrolled.html', {'course': course})
+    # Hanya siswa yang harus enroll, instruktur/staff/superuser boleh akses
+    if request.user != course.instructor and not request.user.is_staff and not request.user.is_superuser:
+        if not Enrollment.objects.filter(student=request.user, course=course).exists():
+            return render(request, 'exam/not_enrolled.html', {'course': course})
     # Cek session aktif
-    session = ExamSession.objects.filter(exam=exam, student=request.user, status__in=[ExamSessionStatus.STARTED, ExamSessionStatus.IN_PROGRESS]).first()
+    session = None
+    if not (request.user == course.instructor or request.user.is_staff or request.user.is_superuser):
+        session = ExamSession.objects.filter(exam=exam, student=request.user, status__in=[ExamSessionStatus.STARTED, ExamSessionStatus.IN_PROGRESS]).first()
     return render(request, 'exam/exam_detail.html', {
         'course': course,
         'exam': exam,
@@ -104,3 +112,88 @@ def submit_answer(request, course_id, session_id):
         url = reverse('exam_session', args=[course_id, session_id]) + f'?q={question_id}'
         return redirect(url)
     return redirect('exam_session', course_id=course_id, session_id=session_id)
+
+class ExamForm(forms.ModelForm):
+    class Meta:
+        model = Exam
+        fields = ['title', 'description', 'duration_minutes', 'passing_score']
+        widgets = {
+            'title': forms.TextInput(attrs={'class': 'mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3'}),
+            'description': forms.Textarea(attrs={'class': 'mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3', 'rows': 3}),
+            'duration_minutes': forms.NumberInput(attrs={'class': 'mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3', 'min': 1}),
+            'passing_score': forms.NumberInput(attrs={'class': 'mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3', 'min': 0, 'max': 100}),
+        }
+
+@login_required
+def add_exam(request, course_id):
+    course = get_object_or_404(Course, id=course_id)
+    if request.user != course.instructor and not request.user.is_staff and not request.user.is_superuser:
+        return HttpResponseForbidden("Anda tidak berhak menambah ujian pada kursus ini.")
+    if request.method == 'POST':
+        form = ExamForm(request.POST)
+        if form.is_valid():
+            exam = form.save(commit=False)
+            exam.course = course
+            exam.save()
+            # Redirect ke halaman tambah soal (add_question)
+            return redirect('add_question', course_id=course.id, exam_id=exam.id)
+    else:
+        form = ExamForm()
+    return render(request, 'exam/exam_form.html', {'form': form, 'course': course, 'action': 'Tambah'})
+
+class QuestionForm(ModelForm):
+    class Meta:
+        model = Question
+        fields = ['text', 'points', 'order']
+        widgets = {
+            'text': forms.Textarea(attrs={'class': 'mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3', 'rows': 3}),
+            'points': forms.NumberInput(attrs={'class': 'mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3', 'min': 1}),
+            'order': forms.NumberInput(attrs={'class': 'mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3', 'min': 1}),
+        }
+
+QuestionOptionFormSet = inlineformset_factory(
+    Question, QuestionOption,
+    fields=['text', 'is_correct', 'order'],
+    extra=4, min_num=4, max_num=4, validate_min=True, validate_max=True
+)
+
+@login_required
+def add_question(request, course_id, exam_id):
+    course = get_object_or_404(Course, id=course_id)
+    exam = get_object_or_404(Exam, id=exam_id, course=course)
+    if request.user != course.instructor and not request.user.is_staff and not request.user.is_superuser:
+        return HttpResponseForbidden("Anda tidak berhak menambah soal pada ujian ini.")
+    if request.method == 'POST':
+        q_form = QuestionForm(request.POST)
+        formset = QuestionOptionFormSet(request.POST)
+        if q_form.is_valid() and formset.is_valid():
+            question = q_form.save(commit=False)
+            question.exam = exam
+            question.type = QuestionType.MULTIPLE_CHOICE
+            question.save()
+            formset.instance = question
+            formset.save()
+            # Redirect ke halaman detail exam atau tambah soal lagi
+            if 'add_another' in request.POST:
+                return redirect('add_question', course_id=course.id, exam_id=exam.id)
+            return redirect('exam_detail', course_id=course.id, exam_id=exam.id)
+    else:
+        q_form = QuestionForm()
+        formset = QuestionOptionFormSet()
+    return render(request, 'exam/add_question.html', {
+        'course': course,
+        'exam': exam,
+        'q_form': q_form,
+        'formset': formset,
+    })
+
+@login_required
+def delete_exam(request, course_id, exam_id):
+    course = get_object_or_404(Course, id=course_id)
+    exam = get_object_or_404(Exam, id=exam_id, course=course)
+    if request.user != course.instructor and not request.user.is_staff and not request.user.is_superuser:
+        return HttpResponseForbidden("Anda tidak berhak menghapus ujian ini.")
+    if request.method == 'POST':
+        exam.delete()
+        return redirect('exam_list', course_id=course.id)
+    return render(request, 'exam/exam_confirm_delete.html', {'course': course, 'exam': exam})

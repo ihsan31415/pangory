@@ -40,6 +40,29 @@ class User(AbstractUser):
     def is_admin(self):
         return self.role == UserRole.ADMIN or self.is_superuser
 
+    @property
+    def courses_taught_count(self):
+        return self.courses_taught.count() if hasattr(self, 'courses_taught') else 0
+
+    @property
+    def students_taught_count(self):
+        from courses.models import Enrollment
+        if hasattr(self, 'courses_taught'):
+            return Enrollment.objects.filter(course__in=self.courses_taught.all()).values('student').distinct().count()
+        return 0
+
+    @property
+    def tasks_created_count(self):
+        if hasattr(self, 'courses_taught'):
+            return sum(course.tasks.count() for course in self.courses_taught.all())
+        return 0
+
+    @property
+    def exams_created_count(self):
+        if hasattr(self, 'courses_taught'):
+            return sum(course.exams.count() for course in self.courses_taught.all())
+        return 0
+
 class UserProfile(models.Model):
     """
     Extended profile information for User
