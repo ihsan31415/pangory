@@ -60,6 +60,11 @@ def login_view(request):
 @login_required
 def user_profile(request):
     user = request.user
+    
+    # Redirect admin users to admin dashboard
+    if user.is_admin or user.is_superuser:
+        return redirect('admin_dashboard')
+    
     profile = user.profile
     if request.method == 'POST':
         user.first_name = request.POST.get('first_name', user.first_name)
