@@ -2,6 +2,79 @@
 {% load youtube_extras %}
 {% block title %}{{ course.title }} - Detail Kursus{% endblock %}
 {% block content %}
+{% if user.is_authenticated and user.is_student %}
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ course.title }}</h1>
+    <div class="flex items-center mb-2">
+        <i class="fas fa-chalkboard-teacher text-cyan-600 mr-2"></i>
+        <span class="text-gray-700">{{ course.instructor.get_full_name }}</span>
+    </div>
+    <p class="text-lg text-gray-600 mb-4">{{ course.description }}</p>
+    {% if course.thumbnail %}
+        <img src="{{ course.thumbnail.url }}" alt="Thumbnail" class="rounded-lg mb-4 max-h-64">
+    {% endif %}
+    <div class="flex space-x-4 text-sm text-gray-500 mb-8">
+        <span><i class="fas fa-users mr-1"></i> {{ student_count }} peserta</span>
+        <span><i class="fas fa-layer-group mr-1"></i> {{ course.module_count }} modul</span>
+        <span><i class="fas fa-calendar-alt mr-1"></i> Dibuat: {{ course.created_at|date:"d M Y" }}</span>
+    </div>
+
+    <div class="bg-white rounded-lg shadow p-6 mb-8">
+        <ul class="flex flex-wrap gap-4 border-b pb-2 mb-6">
+            <li><a href="#materi" class="font-semibold text-cyan-700 hover:underline">Materi</a></li>
+            <li><a href="#tugas" class="font-semibold text-purple-700 hover:underline">Tugas</a></li>
+            <li><a href="#ujian" class="font-semibold text-pink-700 hover:underline">Ujian</a></li>
+        </ul>
+        <div id="materi">
+            <h2 class="text-xl font-bold text-cyan-700 mb-4">Materi</h2>
+            {% if modules %}
+                {% for module in modules %}
+                    <div class="mb-6">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2">Modul: {{ module.title }}</h3>
+                        <ul class="space-y-2">
+                            {% for material in module.materials.all %}
+                            <li class="bg-gray-50 rounded p-3 flex items-center justify-between">
+                                <div>
+                                    <span class="font-medium">{{ material.title }}</span>
+                                    <span class="ml-2 text-xs text-gray-500">({{ material.get_type_display }})</span>
+                                </div>
+                                <a href="{% url 'course_player' course.id material.id %}" class="text-cyan-600 hover:underline text-xs"><i class="fas fa-play mr-1"></i>Lihat</a>
+                            </li>
+                            {% empty %}
+                            <li class="text-gray-400 text-sm">Belum ada materi di modul ini.</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="text-gray-400 text-sm">Belum ada modul/materi pada kursus ini.</div>
+            {% endif %}
+        </div>
+        <div id="tugas" class="mt-10">
+            <h2 class="text-xl font-bold text-purple-700 mb-4">Tugas</h2>
+            {% if tasks %}
+                <ul class="space-y-4">
+                    {% for task in tasks %}
+                    <li class="bg-gray-50 rounded p-4 flex justify-between items-center">
+                        <div>
+                            <div class="font-semibold text-gray-800">{{ task.title }}</div>
+                            <div class="text-xs text-gray-500">Deadline: {% if task.due_date %}{{ task.due_date|date:"d M Y H:i" }}{% else %}-{% endif %}</div>
+                        </div>
+                        <a href="{% url 'task_detail' course.id task.id %}" class="text-purple-600 hover:underline text-xs"><i class="fas fa-file-alt mr-1"></i>Lihat / Kerjakan</a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <div class="text-gray-400 text-sm">Belum ada tugas pada kursus ini.</div>
+            {% endif %}
+        </div>
+        <div id="ujian" class="mt-10">
+            <h2 class="text-xl font-bold text-pink-700 mb-4">Ujian</h2>
+            <a href="{% url 'exam_list' course.id %}" class="inline-block px-4 py-2 bg-pink-600 text-white rounded hover:bg-pink-700 text-xs mb-4"><i class="fas fa-file-alt mr-1"></i>Lihat Daftar Ujian</a>
+        </div>
+    </div>
+</div>
+{% else %}
 <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ course.title }}</h1>
     <div class="flex items-center mb-2">
@@ -186,4 +259,5 @@
         <a href="{% url 'course_enrollments' course.id %}" class="inline-flex items-center px-3 py-1 bg-cyan-700 text-white rounded hover:bg-cyan-800 text-xs"><i class="fas fa-user-plus mr-1"></i>Tambah Peserta</a>
     </div>
 </div>
+{% endif %}
 {% endblock %}

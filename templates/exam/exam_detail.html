@@ -1,20 +1,165 @@
 {% extends "base.html" %}
-{% block title %}{{ exam.title }} - Exam{% endblock %}
+{% block title %}{{ exam.title }} - Detail Ujian{% endblock %}
 {% block content %}
-<div class="max-w-xl mx-auto py-8">
-    <h2 class="text-2xl font-bold mb-2">{{ exam.title }}</h2>
-    <div class="mb-2 text-gray-600">{{ exam.description }}</div>
-    <div class="mb-4">
-        <span class="mr-4">Durasi: <b>{{ exam.duration_minutes }}</b> menit</span>
-        <span>Jumlah Soal: <b>{{ exam.question_count }}</b></span>
+<div class="max-w-3xl mx-auto py-8 px-4">
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <h1 class="text-2xl font-bold text-gray-800 mb-4">{{ exam.title }}</h1>
+        <div class="text-gray-600 mb-6">{{ exam.description }}</div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div class="bg-gray-50 p-4 rounded-lg">
+                <div class="text-sm text-gray-500">Durasi</div>
+                <div class="text-lg font-semibold text-gray-800">{{ exam.duration_minutes }} menit</div>
+            </div>
+            <div class="bg-gray-50 p-4 rounded-lg">
+                <div class="text-sm text-gray-500">Jumlah Soal</div>
+                <div class="text-lg font-semibold text-gray-800">{{ exam.question_count }}</div>
+            </div>
+            <div class="bg-gray-50 p-4 rounded-lg">
+                <div class="text-sm text-gray-500">Nilai Kelulusan</div>
+                <div class="text-lg font-semibold text-gray-800">{{ exam.passing_score }}%</div>
+            </div>
+        </div>
+
+        {% if user == course.instructor or user.is_staff or user.is_superuser %}
+        <!-- Tampilan untuk instruktur -->
+        <div class="mb-6">
+            <h2 class="text-lg font-semibold text-gray-800 mb-2">Daftar Soal</h2>
+            {% if exam.questions.exists %}
+            <div class="bg-gray-50 p-4 rounded-lg">
+                <ul class="space-y-2">
+                    {% for question in exam.questions.all %}
+                    <li>
+                        <div class="font-medium">{{ forloop.counter }}. {{ question.text }}</div>
+                        <div class="text-sm text-gray-500">
+                            {{ question.get_type_display }} - {{ question.points }} poin
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% else %}
+            <div class="text-gray-500">Belum ada soal untuk ujian ini.</div>
+            {% endif %}
+        </div>
+
+        <div class="mb-6">
+            <h2 class="text-lg font-semibold text-gray-800 mb-2">Hasil Ujian Siswa</h2>
+            {% if exam.sessions.exists %}
+            <div class="overflow-x-auto">
+                <table class="min-w-full bg-white border border-gray-200">
+                    <thead>
+                        <tr>
+                            <th class="py-2 px-4 border-b text-left">Siswa</th>
+                            <th class="py-2 px-4 border-b text-left">Status</th>
+                            <th class="py-2 px-4 border-b text-left">Nilai</th>
+                            <th class="py-2 px-4 border-b text-left">Tanggal</th>
+                            <th class="py-2 px-4 border-b text-left">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for session in exam.sessions.all %}
+                        <tr>
+                            <td class="py-2 px-4 border-b">{{ session.student.username }}</td>
+                            <td class="py-2 px-4 border-b">
+                                {% if session.status == 'SUBMITTED' or session.status == 'GRADED' %}
+                                <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">Selesai</span>
+                                {% else %}
+                                <span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs">Sedang Mengerjakan</span>
+                                {% endif %}
+                            </td>
+                            <td class="py-2 px-4 border-b">
+                                {% if session.score is not None %}
+                                {{ session.score|floatformat:1 }}%
+                                {% else %}
+                                -
+                                {% endif %}
+                            </td>
+                            <td class="py-2 px-4 border-b">
+                                {% if session.end_time %}
+                                {{ session.end_time|date:"d M Y, H:i" }}
+                                {% else %}
+                                {{ session.start_time|date:"d M Y, H:i" }}
+                                {% endif %}
+                            </td>
+                            <td class="py-2 px-4 border-b">
+                                {% if session.status == 'SUBMITTED' or session.status == 'GRADED' %}
+                                <a href="{% url 'exam_result' course.id session.id %}" class="text-cyan-600 hover:text-cyan-800">Lihat Hasil</a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-gray-500">Belum ada siswa yang mengerjakan ujian ini.</div>
+            {% endif %}
+        </div>
+
+        <div class="flex space-x-4">
+            <a href="{% url 'add_question' course.id exam.id %}" class="bg-cyan-600 text-white px-4 py-2 rounded hover:bg-cyan-700">
+                Tambah Soal
+            </a>
+            <a href="{% url 'exam_list' course.id %}" class="bg-gray-200 text-gray-800 px-4 py-2 rounded hover:bg-gray-300">
+                Kembali ke Daftar Ujian
+            </a>
+        </div>
+        
+        {% else %}
+        <!-- Tampilan untuk siswa -->
+        {% if session %}
+        <!-- Ujian sedang berlangsung -->
+        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                    </svg>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm text-yellow-700">
+                        Anda sedang mengerjakan ujian ini. Klik tombol di bawah untuk melanjutkan.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <a href="{% url 'exam_session' course.id session.id %}" class="inline-block bg-cyan-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-cyan-700">
+            Lanjutkan Ujian
+        </a>
+        {% elif completed_session %}
+        <!-- Ujian sudah selesai -->
+        <div class="bg-green-50 border-l-4 border-green-400 p-4 mb-6">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                    </svg>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm text-green-700">
+                        Anda sudah menyelesaikan ujian ini. Klik tombol di bawah untuk melihat hasil.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <a href="{% url 'exam_result' course.id completed_session.id %}" class="inline-block bg-green-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-green-700">
+            Lihat Hasil Ujian
+        </a>
+        {% else %}
+        <!-- Belum mengerjakan ujian -->
+        <div class="mb-6">
+            <p class="text-gray-600">Klik tombol di bawah untuk memulai ujian. Pastikan Anda siap sebelum memulai karena waktu akan langsung berjalan.</p>
+        </div>
+        <a href="{% url 'start_exam' course.id exam.id %}" class="inline-block bg-cyan-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-cyan-700" onclick="return confirm('Apakah Anda yakin ingin memulai ujian ini? Waktu akan langsung berjalan.')">
+            Mulai Ujian
+        </a>
+        {% endif %}
+        
+        <div class="mt-6">
+            <a href="{% url 'course_detail' course.id %}" class="text-cyan-600 hover:underline">← Kembali ke detail kursus</a>
+        </div>
     </div>
-    {% if user == exam.course.instructor or user.is_staff or user.is_superuser %}
-        <a href="#" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 mb-4 inline-block"><i class="fas fa-plus mr-2"></i>Tambah Soal</a>
-    {% endif %}
-    {% if session %}
-        <a href="{% url 'exam_session' course.id session.id %}" class="bg-cyan-600 text-white px-4 py-2 rounded">Lanjutkan Ujian</a>
-    {% else %}
-        <a href="{% url 'start_exam' course.id exam.id %}" class="bg-cyan-600 text-white px-4 py-2 rounded">Mulai Ujian</a>
-    {% endif %}
 </div>
+{% endif %}
 {% endblock %}

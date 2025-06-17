@@ -27,8 +27,9 @@ def student_course_list(request):
 
 @login_required
 def enroll_course(request, course_id):
-    course = get_object_or_404(Course, id=course_id, status='PUBLISHED')  # perbaiki status
-    Enrollment.objects.get_or_create(student=request.user, course=course)
+    course = get_object_or_404(Course, id=course_id, status='PUBLISHED')
+    enrollment, created = Enrollment.objects.get_or_create(student=request.user, course=course)
+    course.students.add(request.user)  # Pastikan user juga masuk ke field students
     return redirect('my_courses')
 
 @login_required
@@ -357,3 +358,14 @@ def edit_material(request, module_id, material_id):
     else:
         form = MaterialForm(instance=material)
     return render(request, 'courses/material_form.html', {'form': form, 'module': module, 'course': course, 'action': 'Edit'})
+
+@login_required
+def unenroll_course(request, course_id):
+    course = get_object_or_404(Course, id=course_id, status='PUBLISHED')
+    enrollment = Enrollment.objects.filter(student=request.user, course=course).first()
+    if request.method == 'POST':
+        if enrollment:
+            enrollment.delete()
+        course.students.remove(request.user)
+        return redirect('my_courses')
+    return render(request, 'courses/unenroll_course_confirm.html', {'course': course})

@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block title %}Hasil Ujian - {{ exam.title }}{% endblock %}
+{% block content %}
+<div class="max-w-3xl mx-auto py-8 px-4">
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <div class="flex items-center justify-between mb-6">
+            <h1 class="text-2xl font-bold text-gray-800">Hasil Ujian: {{ exam.title }}</h1>
+            <div class="flex items-center">
+                {% if session.passed %}
+                <span class="bg-green-100 text-green-800 text-sm font-medium px-3 py-1 rounded-full">LULUS</span>
+                {% else %}
+                <span class="bg-red-100 text-red-800 text-sm font-medium px-3 py-1 rounded-full">TIDAK LULUS</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div class="bg-gray-50 p-4 rounded-lg">
+                <div class="text-sm text-gray-500">Nilai</div>
+                <div class="text-3xl font-bold text-gray-800">{{ session.score|floatformat:1 }}%</div>
+            </div>
+            <div class="bg-gray-50 p-4 rounded-lg">
+                <div class="text-sm text-gray-500">Nilai Kelulusan</div>
+                <div class="text-3xl font-bold text-gray-800">{{ exam.passing_score }}%</div>
+            </div>
+            <div class="bg-gray-50 p-4 rounded-lg">
+                <div class="text-sm text-gray-500">Waktu Selesai</div>
+                <div class="text-lg font-semibold text-gray-800">{{ session.end_time|date:"d M Y, H:i" }}</div>
+            </div>
+        </div>
+
+        <div class="mb-6">
+            <h2 class="text-lg font-semibold text-gray-800 mb-2">Ringkasan Jawaban</h2>
+            <div class="overflow-x-auto">
+                <table class="min-w-full bg-white border border-gray-200">
+                    <thead>
+                        <tr>
+                            <th class="py-2 px-4 border-b text-left">No</th>
+                            <th class="py-2 px-4 border-b text-left">Pertanyaan</th>
+                            <th class="py-2 px-4 border-b text-left">Status</th>
+                            <th class="py-2 px-4 border-b text-left">Poin</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for answer in answers %}
+                        <tr>
+                            <td class="py-2 px-4 border-b">{{ forloop.counter }}</td>
+                            <td class="py-2 px-4 border-b">{{ answer.question.text|truncatechars:50 }}</td>
+                            <td class="py-2 px-4 border-b">
+                                {% if answer.question.type == 'MULTIPLE_CHOICE' %}
+                                    {% if answer.selected_option.is_correct %}
+                                    <span class="text-green-600 font-medium">Benar</span>
+                                    {% else %}
+                                    <span class="text-red-600 font-medium">Salah</span>
+                                    {% endif %}
+                                {% else %}
+                                    <span class="text-gray-600">Esai</span>
+                                {% endif %}
+                            </td>
+                            <td class="py-2 px-4 border-b">
+                                {% if answer.points_earned is not None %}
+                                {{ answer.points_earned }} / {{ answer.question.points }}
+                                {% else %}
+                                - / {{ answer.question.points }}
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="flex justify-between">
+            <a href="{% url 'course_detail' exam.course.id %}" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded">
+                Kembali ke Kursus
+            </a>
+            <a href="{% url 'exam_list' exam.course.id %}" class="bg-cyan-600 hover:bg-cyan-700 text-white font-medium py-2 px-4 rounded">
+                Lihat Semua Ujian
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %} 

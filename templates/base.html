@@ -49,40 +49,9 @@
                         {% endif %}
                     {% endif %}
                     {% if user.is_authenticated and user.is_instructor %}
-                        <div class="relative group">
-                            <button class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-cyan-600 transition focus:outline-none flex items-center">
-                                <span>Pencapaian</span>
-                                <i class="fas fa-chevron-down ml-1 text-xs"></i>
-                            </button>
-                            <div class="hidden group-hover:block absolute z-30 bg-white shadow-lg rounded-md mt-2 min-w-[260px] right-0 border border-gray-100">
-                                <div class="px-4 py-3 border-b font-semibold text-cyan-700">Statistik</div>
-                                <div class="px-4 py-2 text-sm text-gray-700">
-                                    <i class="fas fa-chalkboard-teacher text-cyan-600 mr-1"></i> {{ user.courses_taught_count|default:'0' }} Kursus<br>
-                                    <i class="fas fa-users text-green-600 mr-1"></i> {{ user.students_taught_count|default:'0' }} Siswa<br>
-                                    <i class="fas fa-tasks text-purple-600 mr-1"></i> {{ user.tasks_created_count|default:'0' }} Tugas<br>
-                                    <i class="fas fa-file-alt text-pink-600 mr-1"></i> {{ user.exams_created_count|default:'0' }} Ujian
-                                </div>
-                                <div class="px-4 py-3 border-t font-semibold text-cyan-700">Badge</div>
-                                <div class="px-4 py-2 text-sm text-yellow-700 flex flex-wrap gap-2">
-                                    <span class="inline-flex items-center px-2 py-1 bg-yellow-100 rounded text-xs font-semibold"><i class="fas fa-star mr-1"></i>Instruktur Populer</span>
-                                    <span class="inline-flex items-center px-2 py-1 bg-green-100 rounded text-xs font-semibold"><i class="fas fa-award mr-1"></i>5 Tahun Mengajar</span>
-                                </div>
-                                <div class="px-4 py-3 border-t font-semibold text-cyan-700">Riwayat Pendidikan</div>
-                                <div class="px-4 py-2 text-sm text-gray-700">
-                                    {% if user.profile.bio and 'universitas' in user.profile.bio|lower or 'university' in user.profile.bio|lower %}
-                                        {{ user.profile.bio|linebreaksbr }}
-                                    {% else %}
-                                        <span class="text-gray-400">Belum diisi.</span>
-                                    {% endif %}
-                                </div>
-                                <div class="px-4 py-3 border-t font-semibold text-cyan-700">Sertifikat Penghargaan</div>
-                                <div class="px-4 py-2 text-sm text-gray-700">
-                                    <i class="fas fa-certificate text-yellow-500 mr-1"></i>Instruktur Terbaik 2024 (dummy)
-                                </div>
-                            </div>
-                        </div>
+                        <a href="{% url 'statistics' %}" class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-cyan-600 transition">Statistik</a>
                     {% else %}
-                        <a href="#" class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-cyan-600 transition">Pencapaian</a>
+                        <a href="{% url 'statistics' %}" class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-cyan-600 transition">Statistik</a>
                     {% endif %}
                 </div>
                 
@@ -141,9 +110,9 @@
                     {% endif %}
                 {% endif %}
                 {% if user.is_authenticated and user.is_instructor %}
-                    <button onclick="document.getElementById('achievements-modal').classList.remove('hidden')" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-cyan-600 hover:bg-gray-50">Pencapaian</button>
+                    <a href="{% url 'statistics' %}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-cyan-600 hover:bg-gray-50">Statistik</a>
                 {% else %}
-                    <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-cyan-600 hover:bg-gray-50">Pencapaian</a>
+                    <a href="{% url 'statistics' %}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-cyan-600 hover:bg-gray-50">Statistik</a>
                 {% endif %}
                 <div class="pt-4 border-t border-gray-200">
                     <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-cyan-600 hover:bg-gray-50">
@@ -181,36 +150,16 @@
         {% endblock %}
     </main>
 
-    <!-- Modal for mobile achievements -->
-    <div id="achievements-modal" class="fixed inset-0 bg-black bg-opacity-40 z-50 flex items-center justify-center hidden">
-        <div class="bg-white rounded-lg shadow-lg w-full max-w-md mx-auto p-6 relative">
-            <button onclick="document.getElementById('achievements-modal').classList.add('hidden')" class="absolute top-2 right-2 text-gray-400 hover:text-gray-700"><i class="fas fa-times"></i></button>
-            <div class="font-bold text-cyan-700 mb-2">Statistik</div>
-            <div class="text-sm text-gray-700 mb-4">
-                <i class="fas fa-chalkboard-teacher text-cyan-600 mr-1"></i> {{ user.courses_taught_count|default:'0' }} Kursus<br>
-                <i class="fas fa-users text-green-600 mr-1"></i> {{ user.students_taught_count|default:'0' }} Siswa<br>
-                <i class="fas fa-tasks text-purple-600 mr-1"></i> {{ user.tasks_created_count|default:'0' }} Tugas<br>
-                <i class="fas fa-file-alt text-pink-600 mr-1"></i> {{ user.exams_created_count|default:'0' }} Ujian
-            </div>
-            <div class="font-bold text-cyan-700 mb-2">Badge</div>
-            <div class="text-yellow-700 flex flex-wrap gap-2 mb-4">
-                <span class="inline-flex items-center px-2 py-1 bg-yellow-100 rounded text-xs font-semibold"><i class="fas fa-star mr-1"></i>Instruktur Populer</span>
-                <span class="inline-flex items-center px-2 py-1 bg-green-100 rounded text-xs font-semibold"><i class="fas fa-award mr-1"></i>5 Tahun Mengajar</span>
-            </div>
-            <div class="font-bold text-cyan-700 mb-2">Riwayat Pendidikan</div>
-            <div class="text-sm text-gray-700 mb-4">
-                {% if user.profile.bio and 'universitas' in user.profile.bio|lower or 'university' in user.profile.bio|lower %}
-                    {{ user.profile.bio|linebreaksbr }}
-                {% else %}
-                    <span class="text-gray-400">Belum diisi.</span>
-                {% endif %}
-            </div>
-            <div class="font-bold text-cyan-700 mb-2">Sertifikat Penghargaan</div>
-            <div class="text-sm text-gray-700">
-                <i class="fas fa-certificate text-yellow-500 mr-1"></i>Instruktur Terbaik 2024 (dummy)
+    <!-- Footer -->
+    <footer class="bg-white shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="py-4">
+                <p class="text-center text-sm text-gray-500">
+                    &copy; 2024 Pangory LMS. All rights reserved.
+                </p>
             </div>
         </div>
-    </div>
+    </footer>
 
     {% block extra_script %}
     <script>

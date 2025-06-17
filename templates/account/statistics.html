@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+{% block title %}Statistik{% endblock %}
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <h1 class="text-3xl font-bold text-gray-900 mb-8">Statistik</h1>
+
+    {% if user.is_instructor %}
+    <!-- Statistik untuk Instruktur -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="flex items-center">
+                <div class="p-3 rounded-full bg-cyan-100 text-cyan-600">
+                    <i class="fas fa-book text-2xl"></i>
+                </div>
+                <div class="ml-4">
+                    <h2 class="text-gray-500 text-sm">Total Kursus</h2>
+                    <p class="text-2xl font-semibold text-gray-900">{{ user.courses_taught_count }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="flex items-center">
+                <div class="p-3 rounded-full bg-green-100 text-green-600">
+                    <i class="fas fa-users text-2xl"></i>
+                </div>
+                <div class="ml-4">
+                    <h2 class="text-gray-500 text-sm">Total Siswa</h2>
+                    <p class="text-2xl font-semibold text-gray-900">{{ user.students_taught_count }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="flex items-center">
+                <div class="p-3 rounded-full bg-purple-100 text-purple-600">
+                    <i class="fas fa-tasks text-2xl"></i>
+                </div>
+                <div class="ml-4">
+                    <h2 class="text-gray-500 text-sm">Total Tugas</h2>
+                    <p class="text-2xl font-semibold text-gray-900">{{ user.tasks_created_count }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="flex items-center">
+                <div class="p-3 rounded-full bg-yellow-100 text-yellow-600">
+                    <i class="fas fa-file-alt text-2xl"></i>
+                </div>
+                <div class="ml-4">
+                    <h2 class="text-gray-500 text-sm">Total Ujian</h2>
+                    <p class="text-2xl font-semibold text-gray-900">{{ user.exams_created_count }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Badge dan Penghargaan -->
+    <div class="bg-white rounded-lg shadow p-6 mb-8">
+        <h2 class="text-xl font-semibold text-gray-900 mb-4">Badge dan Penghargaan</h2>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {% if user.courses_taught_count >= 5 %}
+            <div class="text-center p-4 bg-cyan-50 rounded-lg">
+                <i class="fas fa-award text-3xl text-cyan-600 mb-2"></i>
+                <p class="font-medium">Instruktur Terbanyak</p>
+                <p class="text-sm text-gray-500">5+ Kursus</p>
+            </div>
+            {% endif %}
+            {% if user.students_taught_count >= 50 %}
+            <div class="text-center p-4 bg-green-50 rounded-lg">
+                <i class="fas fa-users text-3xl text-green-600 mb-2"></i>
+                <p class="font-medium">Mentor Populer</p>
+                <p class="text-sm text-gray-500">50+ Siswa</p>
+            </div>
+            {% endif %}
+            {% if user.tasks_created_count >= 20 %}
+            <div class="text-center p-4 bg-purple-50 rounded-lg">
+                <i class="fas fa-tasks text-3xl text-purple-600 mb-2"></i>
+                <p class="font-medium">Pembuat Tugas Aktif</p>
+                <p class="text-sm text-gray-500">20+ Tugas</p>
+            </div>
+            {% endif %}
+            {% if user.exams_created_count >= 10 %}
+            <div class="text-center p-4 bg-yellow-50 rounded-lg">
+                <i class="fas fa-file-alt text-3xl text-yellow-600 mb-2"></i>
+                <p class="font-medium">Evaluator Terpercaya</p>
+                <p class="text-sm text-gray-500">10+ Ujian</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Riwayat Pendidikan -->
+    <div class="bg-white rounded-lg shadow p-6">
+        <h2 class="text-xl font-semibold text-gray-900 mb-4">Riwayat Pendidikan</h2>
+        <div class="space-y-4">
+            <div class="flex items-start">
+                <div class="flex-shrink-0">
+                    <div class="h-8 w-8 rounded-full bg-cyan-100 flex items-center justify-center">
+                        <i class="fas fa-graduation-cap text-cyan-600"></i>
+                    </div>
+                </div>
+                <div class="ml-4">
+                    <h3 class="text-lg font-medium text-gray-900">S1 Teknik Informatika</h3>
+                    <p class="text-gray-500">Universitas Negeri Semarang</p>
+                    <p class="text-sm text-gray-400">2018 - 2022</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% else %}
+    <!-- Statistik untuk Siswa -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="flex items-center">
+                <div class="p-3 rounded-full bg-cyan-100 text-cyan-600">
+                    <i class="fas fa-book text-2xl"></i>
+                </div>
+                <div class="ml-4">
+                    <h2 class="text-gray-500 text-sm">Kursus yang Diikuti</h2>
+                    <p class="text-2xl font-semibold text-gray-900">{{ user.enrollments.count }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="flex items-center">
+                <div class="p-3 rounded-full bg-green-100 text-green-600">
+                    <i class="fas fa-check-circle text-2xl"></i>
+                </div>
+                <div class="ml-4">
+                    <h2 class="text-gray-500 text-sm">Tugas Selesai</h2>
+                    <p class="text-2xl font-semibold text-gray-900">{{ completed_tasks_count }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="flex items-center">
+                <div class="p-3 rounded-full bg-purple-100 text-purple-600">
+                    <i class="fas fa-certificate text-2xl"></i>
+                </div>
+                <div class="ml-4">
+                    <h2 class="text-gray-500 text-sm">Sertifikat</h2>
+                    <p class="text-2xl font-semibold text-gray-900">{{ user.certificates.count }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Daftar Sertifikat -->
+    <div class="bg-white rounded-lg shadow p-6 mb-8">
+        <h2 class="text-xl font-semibold text-gray-900 mb-4">Sertifikat Saya</h2>
+        {% if user.certificates.exists %}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {% for certificate in user.certificates.all %}
+            <div class="border rounded-lg p-4 hover:shadow-md transition">
+                <div class="flex items-center mb-3">
+                    <i class="fas fa-certificate text-2xl text-cyan-600 mr-3"></i>
+                    <div>
+                        <h3 class="font-medium text-gray-900">{{ certificate.course.title }}</h3>
+                        <p class="text-sm text-gray-500">Diterbitkan: {{ certificate.issue_date|date:"d M Y" }}</p>
+                    </div>
+                </div>
+                <a href="{% url 'certificate_detail' certificate.course.id certificate.id %}" 
+                   class="inline-flex items-center text-sm text-cyan-600 hover:text-cyan-700">
+                    <i class="fas fa-eye mr-1"></i> Lihat Sertifikat
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-gray-500 text-center py-4">Belum ada sertifikat yang diperoleh.</p>
+        {% endif %}
+    </div>
+
+    <!-- Badge dan Penghargaan -->
+    <div class="bg-white rounded-lg shadow p-6">
+        <h2 class="text-xl font-semibold text-gray-900 mb-4">Badge dan Penghargaan</h2>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {% if user.enrollments.count >= 5 %}
+            <div class="text-center p-4 bg-cyan-50 rounded-lg">
+                <i class="fas fa-book text-3xl text-cyan-600 mb-2"></i>
+                <p class="font-medium">Pembelajar Aktif</p>
+                <p class="text-sm text-gray-500">5+ Kursus</p>
+            </div>
+            {% endif %}
+            {% if completed_tasks_count >= 20 %}
+            <div class="text-center p-4 bg-green-50 rounded-lg">
+                <i class="fas fa-check-circle text-3xl text-green-600 mb-2"></i>
+                <p class="font-medium">Penyelesaian Tugas</p>
+                <p class="text-sm text-gray-500">20+ Tugas</p>
+            </div>
+            {% endif %}
+            {% if user.certificates.count >= 3 %}
+            <div class="text-center p-4 bg-purple-50 rounded-lg">
+                <i class="fas fa-certificate text-3xl text-purple-600 mb-2"></i>
+                <p class="font-medium">Kolektor Sertifikat</p>
+                <p class="text-sm text-gray-500">3+ Sertifikat</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %} 

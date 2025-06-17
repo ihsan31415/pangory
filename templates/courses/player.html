@@ -10,8 +10,8 @@
                 <ul class="space-y-2">
                     {% for m in materials %}
                     <li>
-                        <a href="{% url 'course_player' course.id m.id %}" class="block px-3 py-2 rounded-md {{ m.id == material.id|add:'0' and 'bg-cyan-100 text-cyan-700 font-semibold' or 'text-gray-700 hover:bg-cyan-50' }}">
-                            <i class="fas {{ m.type == 'VIDEO' and 'fa-play-circle' or m.type == 'PDF' and 'fa-file-pdf' or m.type == 'TEXT' and 'fa-file-alt' or 'fa-link' }} mr-2"></i>
+                        <a href="{% url 'course_player' course.id m.id %}" class="block px-3 py-2 rounded-md {% if m.id == material.id %}bg-cyan-100 text-cyan-700 font-semibold{% else %}text-gray-700 hover:bg-cyan-50{% endif %}">
+                            <i class="fas {% if m.type == 'VIDEO' %}fa-play-circle{% elif m.type == 'PDF' %}fa-file-pdf{% elif m.type == 'TEXT' %}fa-file-alt{% else %}fa-link{% endif %} mr-2"></i>
                             {{ m.title }}
                         </a>
                     </li>

@@ -15,7 +15,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from graphene_file_upload.django import FileUploadGraphQLView
@@ -32,9 +32,11 @@ from django.contrib.auth import views as auth_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('admin-dashboard/', accounts_views.admin_dashboard, name='admin_dashboard'),
     path('graphql/', csrf_exempt(FileUploadGraphQLView.as_view(graphiql=True))),
     path('register/', accounts_views.register, name='register'),
     path('login/', accounts_views.login_view, name='login'),
+    path('accounts/', include('accounts.urls')),
     path('userprofile/', accounts_views.user_profile, name='user_profile'),
     path('', views.index, name='index'),
     path('about/', views.about, name='about'),
@@ -47,6 +49,7 @@ urlpatterns = [
     path('courses/<int:course_id>/', courses_views.course_detail, name='course_detail'),
     path('courses/<int:course_id>/students/', courses_views.course_enrolled_students, name='course_enrolled_students'),
     path('courses/<int:course_id>/task/<int:task_id>/', courses_views.task_detail, name='task_detail'),
+    path('courses/<int:course_id>/unenroll/', courses_views.unenroll_course, name='unenroll_course'),
     # untuk discsission
     path('courses/<int:course_id>/discussion/', discussions_views.course_discussion, name='course_discussion'),
     path('courses/<int:course_id>/discussion/post/<int:post_id>/', discussions_views.discussion_post_detail, name='discussion_post_detail'),
@@ -58,6 +61,7 @@ urlpatterns = [
     path('courses/<int:course_id>/exams/<int:exam_id>/start/', exams_views.start_exam, name='start_exam'),
     path('courses/<int:course_id>/exams/session/<int:session_id>/', exams_views.exam_session, name='exam_session'),
     path('courses/<int:course_id>/exams/session/<int:session_id>/submit/', exams_views.submit_answer, name='submit_answer'),
+    path('courses/<int:course_id>/exams/session/<int:session_id>/result/', exams_views.exam_result, name='exam_result'),
     path('courses/<int:course_id>/exams/<int:exam_id>/questions/add/', exams_views.add_question, name='add_question'),
     path('courses/<int:course_id>/exams/<int:exam_id>/delete/', exams_views.delete_exam, name='delete_exam'),
 

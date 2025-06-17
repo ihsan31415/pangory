@@ -28,6 +28,22 @@ def student_dashboard(request):
         progress_percent = 0
     # Sertifikat user
     certificates = Certificate.objects.filter(user=user)
+    
+    # Ujian siswa
+    from exams.models import Exam, ExamSession, ExamSessionStatus
+    # Ambil semua ujian dari kursus yang diikuti
+    available_exams = Exam.objects.filter(course__in=my_courses)
+    # Ambil sesi ujian yang sudah selesai
+    completed_exam_sessions = ExamSession.objects.filter(
+        student=user, 
+        status__in=[ExamSessionStatus.SUBMITTED, ExamSessionStatus.GRADED]
+    ).select_related('exam')
+    # Ambil sesi ujian yang sedang berlangsung
+    ongoing_exam_sessions = ExamSession.objects.filter(
+        student=user, 
+        status__in=[ExamSessionStatus.STARTED, ExamSessionStatus.IN_PROGRESS]
+    ).select_related('exam')
+    
     # Dummy notifikasi
     notifications = [
         {"message": "Selamat datang di Pangory!", "timestamp": user.date_joined},
@@ -38,6 +54,9 @@ def student_dashboard(request):
         'progress_percent': progress_percent,
         'certificates': certificates,
         'notifications': notifications,
+        'available_exams': available_exams,
+        'completed_exam_sessions': completed_exam_sessions,
+        'ongoing_exam_sessions': ongoing_exam_sessions,
     })
 
 @login_required

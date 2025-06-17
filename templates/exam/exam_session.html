@@ -1,39 +1,74 @@
 {% extends "base.html" %}
 {% block title %}{{ exam.title }} - Ujian{% endblock %}
 {% block content %}
-<div class="max-w-xl mx-auto py-8">
-    <h2 class="text-xl font-bold mb-4">{{ exam.title }}</h2>
-    <form method="post" action="{% url 'submit_answer' exam.course.id session.id %}?q={{ question.id }}">
-        {% csrf_token %}
-        <input type="hidden" name="question_id" value="{{ question.id }}">
-        <div class="mb-4">
-            <div class="font-semibold mb-2">Soal: {{ question.text }}</div>
-            {% if question.type == 'MULTIPLE_CHOICE' %}
-                {% for option in options %}
+<div class="max-w-3xl mx-auto py-8 px-4">
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-2xl font-bold text-gray-800">{{ exam.title }}</h1>
+            <div class="text-sm text-gray-500">
+                Soal {{ forloop.counter }} dari {{ questions|length }}
+            </div>
+        </div>
+        
+        <form method="post" action="{% url 'submit_answer' exam.course.id session.id %}?q={{ question.id }}">
+            {% csrf_token %}
+            <input type="hidden" name="question_id" value="{{ question.id }}">
+            
+            <div class="mb-6">
+                <div class="font-semibold mb-3 text-lg">{{ question.text }}</div>
+                
+                {% if question.type == 'MULTIPLE_CHOICE' %}
+                    <div class="space-y-3">
+                        {% for option in options %}
+                        <div class="bg-gray-50 p-3 rounded-lg hover:bg-gray-100">
+                            <label class="flex items-center cursor-pointer">
+                                <input type="radio" name="selected_option" value="{{ option.id }}" class="h-4 w-4 text-cyan-600"
+                                    {% if answer and answer.selected_option and answer.selected_option.id == option.id %}checked{% endif %}>
+                                <span class="ml-2">{{ option.text }}</span>
+                            </label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% elif question.type == 'ESSAY' %}
+                    <textarea name="text_answer" rows="6" class="w-full border rounded-lg p-3 focus:ring-cyan-500 focus:border-cyan-500" required>{% if answer %}{{ answer.text_answer }}{% endif %}</textarea>
+                {% endif %}
+            </div>
+            
+            <div class="flex justify-between items-center mt-8">
                 <div>
-                    <label>
-                        <input type="radio" name="selected_option" value="{{ option.id }}"
-                            {% if answer and answer.selected_option and answer.selected_option.id == option.id %}checked{% endif %}>
-                        {{ option.text }}
-                    </label>
+                    {% if prev_id %}
+                        <a href="{% url 'exam_session' exam.course.id session.id %}?q={{ prev_id }}" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded">
+                            <i class="fas fa-arrow-left mr-1"></i> Sebelumnya
+                        </a>
+                    {% endif %}
                 </div>
+                
+                <div>
+                    {% if next_id %}
+                        <button type="submit" name="next_q" value="{{ next_id }}" class="bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2 rounded">
+                            Selanjutnya <i class="fas fa-arrow-right ml-1"></i>
+                        </button>
+                    {% else %}
+                        <button type="submit" name="finish" value="1" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">
+                            Selesai <i class="fas fa-check ml-1"></i>
+                        </button>
+                    {% endif %}
+                </div>
+            </div>
+        </form>
+        
+        <!-- Navigasi soal -->
+        <div class="mt-8 pt-6 border-t border-gray-200">
+            <div class="text-sm text-gray-500 mb-2">Navigasi Soal:</div>
+            <div class="flex flex-wrap gap-2">
+                {% for q in questions %}
+                <a href="{% url 'exam_session' exam.course.id session.id %}?q={{ q.id }}" 
+                   class="w-8 h-8 flex items-center justify-center rounded-full {% if q.id == question.id %}bg-cyan-600 text-white{% else %}bg-gray-200 text-gray-800 hover:bg-gray-300{% endif %}">
+                    {{ forloop.counter }}
+                </a>
                 {% endfor %}
-            {% elif question.type == 'ESSAY' %}
-                <textarea name="text_answer" rows="4" class="w-full border rounded" required>{% if answer %}{{ answer.text_answer }}{% endif %}</textarea>
-            {% endif %}
+            </div>
         </div>
-        <div class="flex justify-between mt-6">
-            {% if prev_id %}
-                <a href="{% url 'exam_session' exam.course.id session.id %}?q={{ prev_id }}" class="bg-gray-300 text-gray-700 px-4 py-2 rounded">Previous</a>
-            {% else %}
-                <span></span>
-            {% endif %}
-            {% if next_id %}
-                <button type="submit" name="next_q" value="{{ next_id }}" class="bg-cyan-600 text-white px-4 py-2 rounded">Next</button>
-            {% else %}
-                <button type="submit" name="finish" value="1" class="bg-cyan-600 text-white px-4 py-2 rounded">Sumbit</button>
-            {% endif %}
-        </div>
-    </form>
+    </div>
 </div>
 {% endblock %}

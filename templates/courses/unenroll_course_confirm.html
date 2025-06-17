@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Konfirmasi Hapus Kursus{% endblock %}
+{% block content %}
+<div class="max-w-lg mx-auto px-4 py-12">
+    <div class="bg-white rounded-lg shadow-md p-8 text-center">
+        <h2 class="text-2xl font-bold text-gray-900 mb-4">Konfirmasi Hapus Kursus</h2>
+        <p class="mb-6 text-gray-700">Apakah Anda yakin ingin menghapus kursus <span class="font-semibold">{{ course.title }}</span> dari daftar kursus Anda?</p>
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="px-6 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition font-semibold">Ya, Hapus</button>
+            <a href="{% url 'my_courses' %}" class="ml-4 px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100 transition">Batal</a>
+        </form>
+    </div>
+</div>
+{% endblock %} 
